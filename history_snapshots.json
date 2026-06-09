@@ -1,0 +1,96 @@
+[
+  {
+    "timestamp": "2026-06-09 09:21:15",
+    "targets": [
+      {
+        "name": "年度销售目标",
+        "completion": 78,
+        "target": 1000000,
+        "current": 780000,
+        "unit": "元"
+      },
+      {
+        "name": "客户增长",
+        "completion": 92,
+        "target": 500,
+        "current": 460,
+        "unit": "个"
+      },
+      {
+        "name": "产品上线",
+        "completion": 65,
+        "target": 12,
+        "current": 8,
+        "unit": "个"
+      },
+      {
+        "name": "团队扩张",
+        "completion": 45,
+        "target": 50,
+        "current": 23,
+        "unit": "人"
+      },
+      {
+        "name": "用户满意度",
+        "completion": 88,
+        "target": 95,
+        "current": 83.6,
+        "unit": "%"
+      },
+      {
+        "name": "市场份额",
+        "completion": 72,
+        "target": 25,
+        "current": 18,
+        "unit": "%"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-06-09 09:21:42",
+    "targets": [
+      {
+        "name": "年度销售目标",
+        "completion": 78,
+        "target": 1000000,
+        "current": 780000,
+        "unit": "元"
+      },
+      {
+        "name": "客户增长",
+        "completion": 92,
+        "target": 500,
+        "current": 460,
+        "unit": "个"
+      },
+      {
+        "name": "产品上线",
+        "completion": 65,
+        "target": 12,
+        "current": 8,
+        "unit": "个"
+      },
+      {
+        "name": "团队扩张",
+        "completion": 45,
+        "target": 50,
+        "current": 23,
+        "unit": "人"
+      },
+      {
+        "name": "用户满意度",
+        "completion": 88,
+        "target": 95,
+        "current": 83.6,
+        "unit": "%"
+      },
+      {
+        "name": "市场份额",
+        "completion": 72,
+        "target": 25,
+        "current": 18,
+        "unit": "%"
+      }
+    ]
+  }
+]
