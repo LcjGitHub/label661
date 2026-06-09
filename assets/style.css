@@ -1744,6 +1744,33 @@ body {
     border-radius: 15px;
     padding: 20px 25px;
     border: 1px solid rgba(255, 255, 255, 0.25);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.sync-status-display-wrapper {
+    flex: 1;
+    min-width: 300px;
+}
+
+.sync-status-display {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.sync-status-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.sync-status-body {
+    flex: 1;
+    min-width: 280px;
 }
 
 .sync-status-header {
