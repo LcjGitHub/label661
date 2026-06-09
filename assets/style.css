@@ -4,6 +4,13 @@
     box-sizing: border-box;
 }
 
+.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
 body {
     font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -987,6 +994,9 @@ body {
 
 .import-modal-overlay.hidden {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 .import-modal {
@@ -1108,6 +1118,9 @@ body {
 
 .error-modal-overlay.hidden {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 @keyframes fadeIn {
@@ -1370,6 +1383,9 @@ body {
 
 .auth-modal-overlay.hidden {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 .auth-modal {
@@ -2311,6 +2327,9 @@ body {
 
 .sync-error-toast.hidden {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 @keyframes slideInRight {

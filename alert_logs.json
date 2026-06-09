@@ -1,5 +1,579 @@
 [
   {
+    "name": "产品上线",
+    "completion": 55.33,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:44:11"
+  },
+  {
+    "name": "市场份额",
+    "completion": 69.44,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:44:01"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 86.87,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:44:01"
+  },
+  {
+    "name": "产品上线",
+    "completion": 53.17,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:44:01"
+  },
+  {
+    "name": "市场份额",
+    "completion": 67.36,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:43:24"
+  },
+  {
+    "name": "产品上线",
+    "completion": 58.58,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:43:24"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 74.72,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:43:11"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 73.94,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:43:02"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 82.96,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:42:11"
+  },
+  {
+    "name": "产品上线",
+    "completion": 68.25,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:41:24"
+  },
+  {
+    "name": "市场份额",
+    "completion": 63.4,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:41:11"
+  },
+  {
+    "name": "市场份额",
+    "completion": 67.24,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:41:08"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 82.76,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:41:08"
+  },
+  {
+    "name": "团队扩张",
+    "completion": 47.74,
+    "threshold": 60,
+    "level": "high",
+    "timestamp": "2026-06-09 19:41:08"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 76.87,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:41:08"
+  },
+  {
+    "name": "市场份额",
+    "completion": 67.24,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:40:25"
+  },
+  {
+    "name": "产品上线",
+    "completion": 57,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:40:02"
+  },
+  {
+    "name": "产品上线",
+    "completion": 67.5,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:39:24"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 84.13,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:39:13"
+  },
+  {
+    "name": "产品上线",
+    "completion": 64.58,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:39:13"
+  },
+  {
+    "name": "市场份额",
+    "completion": 71.04,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:39:01"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 89.07,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:39:01"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 75.21,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:38:02"
+  },
+  {
+    "name": "产品上线",
+    "completion": 66.42,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:37:24"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 78.52,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:37:24"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 86.32,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:37:11"
+  },
+  {
+    "name": "产品上线",
+    "completion": 63.75,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:37:01"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 86.49,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:36:23"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 75.41,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:36:10"
+  },
+  {
+    "name": "市场份额",
+    "completion": 64.12,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:36:01"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 77.03,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:36:01"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 89.41,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:34:23"
+  },
+  {
+    "name": "市场份额",
+    "completion": 71.72,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:34:11"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 84.26,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:33:01"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 88.44,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:32:24"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 77.11,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:32:24"
+  },
+  {
+    "name": "产品上线",
+    "completion": 57,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:32:03"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 79.38,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:32:03"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 85.6,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:31:11"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 77.46,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:31:11"
+  },
+  {
+    "name": "市场份额",
+    "completion": 71.6,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:30:23"
+  },
+  {
+    "name": "团队扩张",
+    "completion": 49.46,
+    "threshold": 60,
+    "level": "high",
+    "timestamp": "2026-06-09 19:30:23"
+  },
+  {
+    "name": "产品上线",
+    "completion": 55.75,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:30:23"
+  },
+  {
+    "name": "市场份额",
+    "completion": 71.6,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:30:14"
+  },
+  {
+    "name": "团队扩张",
+    "completion": 49.46,
+    "threshold": 60,
+    "level": "high",
+    "timestamp": "2026-06-09 19:30:14"
+  },
+  {
+    "name": "产品上线",
+    "completion": 55.75,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:30:14"
+  },
+  {
+    "name": "市场份额",
+    "completion": 71.6,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:30:14"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 79.88,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:30:02"
+  },
+  {
+    "name": "团队扩张",
+    "completion": 42.18,
+    "threshold": 60,
+    "level": "high",
+    "timestamp": "2026-06-09 19:29:29"
+  },
+  {
+    "name": "产品上线",
+    "completion": 59.33,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:29:29"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 76.85,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:29:29"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 88.77,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:29:02"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 83.17,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:29:00"
+  },
+  {
+    "name": "团队扩张",
+    "completion": 40.46,
+    "threshold": 60,
+    "level": "high",
+    "timestamp": "2026-06-09 19:29:00"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 79.46,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:29:00"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 83.17,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:28:38"
+  },
+  {
+    "name": "团队扩张",
+    "completion": 40.46,
+    "threshold": 60,
+    "level": "high",
+    "timestamp": "2026-06-09 19:28:38"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 79.46,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:28:38"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 83.17,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:28:16"
+  },
+  {
+    "name": "团队扩张",
+    "completion": 40.46,
+    "threshold": 60,
+    "level": "high",
+    "timestamp": "2026-06-09 19:28:16"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 79.46,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:28:16"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 79.46,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:28:15"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 74.36,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:28:11"
+  },
+  {
+    "name": "产品上线",
+    "completion": 67.25,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:28:02"
+  },
+  {
+    "name": "市场份额",
+    "completion": 68,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:27:14"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 86.53,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:27:14"
+  },
+  {
+    "name": "团队扩张",
+    "completion": 37.84,
+    "threshold": 60,
+    "level": "high",
+    "timestamp": "2026-06-09 19:27:14"
+  },
+  {
+    "name": "产品上线",
+    "completion": 55.92,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:27:11"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 73.54,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:27:01"
+  },
+  {
+    "name": "市场份额",
+    "completion": 73.08,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:26:03"
+  },
+  {
+    "name": "产品上线",
+    "completion": 53.42,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:26:03"
+  },
+  {
+    "name": "市场份额",
+    "completion": 68,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:25:58"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 86.53,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:25:58"
+  },
+  {
+    "name": "团队扩张",
+    "completion": 37.84,
+    "threshold": 60,
+    "level": "high",
+    "timestamp": "2026-06-09 19:25:58"
+  },
+  {
+    "name": "市场份额",
+    "completion": 71.72,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:25:10"
+  },
+  {
+    "name": "产品上线",
+    "completion": 64.5,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:25:10"
+  },
+  {
+    "name": "市场份额",
+    "completion": 70.12,
+    "threshold": 75,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:24:04"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 89.75,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:24:04"
+  },
+  {
+    "name": "团队扩张",
+    "completion": 51.46,
+    "threshold": 60,
+    "level": "high",
+    "timestamp": "2026-06-09 19:24:04"
+  },
+  {
+    "name": "产品上线",
+    "completion": 57.83,
+    "threshold": 70,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:24:04"
+  },
+  {
+    "name": "年度销售目标",
+    "completion": 73.61,
+    "threshold": 80,
+    "level": "medium",
+    "timestamp": "2026-06-09 19:24:04"
+  },
+  {
+    "name": "用户满意度",
+    "completion": 89.75,
+    "threshold": 90,
+    "level": "low",
+    "timestamp": "2026-06-09 19:24:04"
+  },
+  {
     "name": "市场份额",
     "completion": 67.28,
     "threshold": 75,
@@ -124,579 +698,5 @@
     "threshold": 80,
     "level": "medium",
     "timestamp": "2026-06-09 19:14:17"
-  },
-  {
-    "name": "市场份额",
-    "completion": 66,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:14:12"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 88.45,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:14:12"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 75.01,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:14:12"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 88.31,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:13:44"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 83.56,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:13:38"
-  },
-  {
-    "name": "团队扩张",
-    "completion": 41.88,
-    "threshold": 60,
-    "level": "high",
-    "timestamp": "2026-06-09 19:13:38"
-  },
-  {
-    "name": "产品上线",
-    "completion": 64.83,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:13:38"
-  },
-  {
-    "name": "产品上线",
-    "completion": 51.92,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:13:12"
-  },
-  {
-    "name": "产品上线",
-    "completion": 66.92,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:12:46"
-  },
-  {
-    "name": "市场份额",
-    "completion": 74.12,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:12:15"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 75.67,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:12:12"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 78.72,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:11:46"
-  },
-  {
-    "name": "产品上线",
-    "completion": 57.75,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:11:17"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 88.88,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:10:45"
-  },
-  {
-    "name": "市场份额",
-    "completion": 68.88,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:10:15"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 87.34,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:10:15"
-  },
-  {
-    "name": "产品上线",
-    "completion": 58.83,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:10:10"
-  },
-  {
-    "name": "市场份额",
-    "completion": 65.76,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:09:44"
-  },
-  {
-    "name": "市场份额",
-    "completion": 74.72,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:09:11"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 75.02,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:08:16"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 84.04,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:08:12"
-  },
-  {
-    "name": "产品上线",
-    "completion": 50.33,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:07:45"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 73.88,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:07:45"
-  },
-  {
-    "name": "市场份额",
-    "completion": 62.72,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:07:17"
-  },
-  {
-    "name": "产品上线",
-    "completion": 50.25,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:07:11"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 74.21,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:05:15"
-  },
-  {
-    "name": "市场份额",
-    "completion": 67.72,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:05:11"
-  },
-  {
-    "name": "产品上线",
-    "completion": 50.83,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:05:11"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 73.27,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:05:11"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 84.17,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:04:45"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 83.75,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:04:12"
-  },
-  {
-    "name": "市场份额",
-    "completion": 65.76,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:03:44"
-  },
-  {
-    "name": "市场份额",
-    "completion": 67.28,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:03:14"
-  },
-  {
-    "name": "市场份额",
-    "completion": 69.92,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:03:10"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 74.47,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:03:10"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 85.56,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:02:44"
-  },
-  {
-    "name": "产品上线",
-    "completion": 56.17,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:01:44"
-  },
-  {
-    "name": "产品上线",
-    "completion": 50.42,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:01:14"
-  },
-  {
-    "name": "产品上线",
-    "completion": 50.33,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 19:01:11"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 86.04,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:00:44"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 88.55,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:00:15"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 88.49,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 19:00:11"
-  },
-  {
-    "name": "产品上线",
-    "completion": 68.42,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:59:44"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 75.04,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:59:44"
-  },
-  {
-    "name": "市场份额",
-    "completion": 69.24,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:59:16"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 75.53,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:59:10"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 88,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 18:58:44"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 89.37,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 18:57:15"
-  },
-  {
-    "name": "市场份额",
-    "completion": 68.44,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:57:10"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 85.69,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 18:57:10"
-  },
-  {
-    "name": "市场份额",
-    "completion": 64.28,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:56:14"
-  },
-  {
-    "name": "产品上线",
-    "completion": 55.83,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:55:49"
-  },
-  {
-    "name": "产品上线",
-    "completion": 59.58,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:55:44"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 76.61,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:55:44"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 77.96,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:55:10"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 77.55,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:54:49"
-  },
-  {
-    "name": "市场份额",
-    "completion": 73.8,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:54:45"
-  },
-  {
-    "name": "市场份额",
-    "completion": 64.84,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:54:12"
-  },
-  {
-    "name": "产品上线",
-    "completion": 55,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:54:12"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 84.63,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 18:53:48"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 84.33,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 18:53:43"
-  },
-  {
-    "name": "市场份额",
-    "completion": 63.72,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:52:45"
-  },
-  {
-    "name": "市场份额",
-    "completion": 64.64,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:52:16"
-  },
-  {
-    "name": "产品上线",
-    "completion": 50.08,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:52:16"
-  },
-  {
-    "name": "市场份额",
-    "completion": 65.08,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:51:49"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 84.65,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 18:51:44"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 89.02,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 18:51:15"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 89.17,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 18:50:48"
-  },
-  {
-    "name": "团队扩张",
-    "completion": 47.36,
-    "threshold": 60,
-    "level": "high",
-    "timestamp": "2026-06-09 18:50:48"
-  },
-  {
-    "name": "产品上线",
-    "completion": 50.08,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:50:48"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 73.62,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:50:48"
-  },
-  {
-    "name": "市场份额",
-    "completion": 61.08,
-    "threshold": 75,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:50:44"
-  },
-  {
-    "name": "产品上线",
-    "completion": 64.33,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:50:44"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 88.49,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 18:50:12"
-  },
-  {
-    "name": "产品上线",
-    "completion": 68.42,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:50:12"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 73.62,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:50:11"
-  },
-  {
-    "name": "用户满意度",
-    "completion": 89.17,
-    "threshold": 90,
-    "level": "low",
-    "timestamp": "2026-06-09 18:50:11"
-  },
-  {
-    "name": "团队扩张",
-    "completion": 47.36,
-    "threshold": 60,
-    "level": "high",
-    "timestamp": "2026-06-09 18:50:11"
-  },
-  {
-    "name": "产品上线",
-    "completion": 50.08,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:50:11"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 73.62,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:50:11"
-  },
-  {
-    "name": "年度销售目标",
-    "completion": 79.73,
-    "threshold": 80,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:49:11"
-  },
-  {
-    "name": "产品上线",
-    "completion": 68.67,
-    "threshold": 70,
-    "level": "medium",
-    "timestamp": "2026-06-09 18:48:44"
   }
 ]

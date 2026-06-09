@@ -766,11 +766,34 @@ def create_comparison_bar_chart(comparison_data):
     fig.add_trace(go.Bar(
         name="日均增长 (%/天)",
         x=target_names,
-        y=[d.get("history_avg_growth", d.get("avg_daily_growth", 0)) for d in comparison_data],
+        y=[d.get("growth_rate", 0) for d in comparison_data],
         marker_color="#00C853",
-        text=[f"{d.get('history_avg_growth', d.get('avg_daily_growth', 0)):.2f}" for d in comparison_data],
+        text=[f"{d.get('growth_rate', 0):.2f}" for d in comparison_data],
         textposition='outside',
         hovertemplate="日均增长: %{y}%/天<extra></extra>"
+    ))
+
+    remaining_days = []
+    remaining_text = []
+    for d in comparison_data:
+        if d.get("completion", 0) >= 100:
+            remaining_days.append(0)
+            remaining_text.append("已完成")
+        elif d.get("estimated_days_remaining") is not None:
+            remaining_days.append(d["estimated_days_remaining"])
+            remaining_text.append(f"{d['estimated_days_remaining']}天")
+        else:
+            remaining_days.append(0)
+            remaining_text.append("无法预测")
+
+    fig.add_trace(go.Bar(
+        name="剩余时间 (天)",
+        x=target_names,
+        y=remaining_days,
+        marker_color="#FF5252",
+        text=remaining_text,
+        textposition='outside',
+        hovertemplate="剩余时间: %{text}<extra></extra>"
     ))
 
     fig.add_trace(go.Bar(
@@ -848,12 +871,19 @@ def create_comparison_detail_card(data, idx):
     disadv_items = [html.Span(f"⚠️ {d}", className="comparison-disadvantage") for d in disadvantages]
 
     est_days = data.get("estimated_days_remaining")
-    if est_days is not None:
+    est_date = data.get("estimated_completion_date", "")
+    if data.get("completion", 0) >= 100:
+        est_text = "已完成"
+    elif est_days is not None and est_date:
+        est_text = f"{est_days} 天 (预计 {est_date})"
+    elif est_days is not None:
         est_text = f"{est_days} 天"
+    elif est_date:
+        est_text = est_date
     else:
-        est_text = data.get("estimated_completion_date", "无法预测")
+        est_text = "无法预测"
 
-    growth_rate = data.get("history_avg_growth", data.get("avg_daily_growth", 0))
+    growth_rate = data.get("growth_rate", 0)
     growth_text = f"{growth_rate:.4f}%/天"
 
     return html.Div([
@@ -879,7 +909,7 @@ def create_comparison_detail_card(data, idx):
                         html.Span(growth_text, className="comparison-metric-value")
                     ], className="comparison-metric"),
                     html.Div([
-                        html.Span("剩余完成", className="comparison-metric-label"),
+                        html.Span("剩余时间", className="comparison-metric-label"),
                         html.Span(est_text, className="comparison-metric-value")
                     ], className="comparison-metric")
                 ], className="comparison-metrics-row"),
@@ -912,13 +942,12 @@ def create_comparison_section(comparison_data):
     if not comparison_data:
         return html.Div([
             html.Div([
-                html.H2("📊 多目标进度对比", className="section-title"),
                 html.Div([
-                    html.Label("选择要对比的目标（至少选择2个或以上）：", className="comparison-label"),
-                    html.Div("从上方下拉框中选择多个目标进行详细对比分析", className="comparison-hint")
+                    html.Label("请从上方下拉框中选择至少2个目标进行对比分析", className="comparison-empty-hint"),
+                    html.Div("💡 支持同时选择多个目标，对比完成率、增速、剩余时间等关键指标", className="comparison-tip-text")
                 ], className="comparison-empty-state")
-            ], className="comparison-header")
-        ], className="comparison-section")
+            ])
+        ], className="comparison-inner-empty")
 
     detail_cards = [
         create_comparison_detail_card(data, idx)
@@ -928,14 +957,9 @@ def create_comparison_section(comparison_data):
     return html.Div([
         html.Div([
             html.Div([
-                html.H2("📊 多目标进度对比", className="section-title"),
-                html.Div([
-                    html.Div([
-                        html.Span(f"共选择 {len(comparison_data)} 个目标进行对比", className="comparison-count"),
-                        html.Span("💡 提示：可查看雷达图查看多维度能力，柱状图查看关键指标", className="comparison-tip")
-                    ], className="comparison-info-row")
-                ], className="comparison-info")
-            ], className="comparison-header"),
+                html.Span(f"共选择 {len(comparison_data)} 个目标进行对比", className="comparison-count"),
+                html.Span("💡 提示：雷达图查看多维度能力，柱状图查看关键指标", className="comparison-tip")
+            ], className="comparison-info-row"),
             html.Div([
                 html.Div([
                     dcc.Graph(

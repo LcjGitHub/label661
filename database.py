@@ -516,9 +516,17 @@ def calculate_comparison_metrics(targets_data, history_data=None):
         else:
             metrics["elapsed_days"] = 0
 
+        initial_completion = 0
+        if target.get("initial_value") is not None and target.get("target", 0) > 0:
+            initial_completion = min(100.0, max(0.0, (target["initial_value"] / target["target"]) * 100))
+            metrics["initial_completion"] = round(initial_completion, 2)
+        else:
+            metrics["initial_completion"] = 0
+
         avg_daily_growth = 0
         if elapsed_days > 0:
-            avg_daily_growth = target["completion"] / elapsed_days
+            actual_increment_pct = max(0, target["completion"] - initial_completion)
+            avg_daily_growth = actual_increment_pct / elapsed_days
             metrics["avg_daily_growth"] = round(avg_daily_growth, 4)
         else:
             metrics["avg_daily_growth"] = 0
@@ -548,7 +556,7 @@ def calculate_comparison_metrics(targets_data, history_data=None):
                 history_days = 1
                 if latest_timestamp:
                     history_days = max(1, (latest_timestamp - earliest_timestamp).total_seconds() / 86400.0)
-                actual_growth = latest_completion - earliest_completion
+                actual_growth = max(0, latest_completion - earliest_completion)
                 metrics["actual_growth"] = round(actual_growth, 2)
                 metrics["history_days"] = round(history_days, 1)
                 metrics["history_avg_growth"] = round(actual_growth / history_days, 4) if history_days > 0 else 0
@@ -566,7 +574,11 @@ def calculate_comparison_metrics(targets_data, history_data=None):
             metrics["history_avg_growth"] = 0
             metrics["data_points"] = 0
 
-        growth_rate = metrics.get("history_avg_growth", metrics["avg_daily_growth"])
+        if metrics["history_avg_growth"] and metrics["history_avg_growth"] > 0:
+            growth_rate = metrics["history_avg_growth"]
+        else:
+            growth_rate = metrics["avg_daily_growth"]
+        metrics["growth_rate"] = round(growth_rate, 4)
         if growth_rate > 0:
             remaining_completion = 100 - target["completion"]
             estimated_days = remaining_completion / growth_rate
@@ -592,7 +604,7 @@ def calculate_comparison_metrics(targets_data, history_data=None):
         else:
             metrics["completion_score"] = 20
 
-        eff_growth = metrics.get("history_avg_growth", metrics["avg_daily_growth"])
+        eff_growth = metrics["growth_rate"]
         if eff_growth >= 5:
             metrics["growth_score"] = 100
         elif eff_growth >= 3:
@@ -641,7 +653,7 @@ def calculate_comparison_metrics(targets_data, history_data=None):
         results.append(metrics)
 
     if results:
-        metrics_keys = ["completion", "avg_daily_growth", "efficiency_score", "overall_score"]
+        metrics_keys = ["completion", "growth_rate", "efficiency_score", "overall_score"]
         for mk in metrics_keys:
             values = [r[mk] for r in results if isinstance(r.get(mk), (int, float))]
             if values:
@@ -668,11 +680,11 @@ def calculate_comparison_metrics(targets_data, history_data=None):
             elif r.get("completion_rank"):
                 disadvantages.append("完成率落后")
 
-            if r.get("avg_daily_growth_rank") == 1:
+            if r.get("growth_rate_rank") == 1:
                 advantages.append("增长速度最快")
-            elif r.get("avg_daily_growth_rank") and r["avg_daily_growth_rank"] <= len(results) / 2:
+            elif r.get("growth_rate_rank") and r["growth_rate_rank"] <= len(results) / 2:
                 advantages.append("增速较快")
-            elif r.get("avg_daily_growth_rank"):
+            elif r.get("growth_rate_rank"):
                 disadvantages.append("增速较慢")
 
             if r.get("overall_score_rank") == 1:
