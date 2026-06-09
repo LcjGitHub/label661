@@ -7,6 +7,7 @@ import os
 import io
 import base64
 import pandas as pd
+import secrets
 
 from alert_module import (
     ALERT_LEVELS,
@@ -19,22 +20,24 @@ from alert_module import (
     detect_and_log_alerts
 )
 
+from database import (
+    register_user,
+    login_user,
+    get_user_by_id,
+    create_target,
+    update_target,
+    delete_target,
+    get_visible_targets,
+    get_target_by_id
+)
+
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 app.title = "目标完成进度监控"
-
-initial_mock_data = [
-    {"name": "年度销售目标", "completion": 78, "target": 1000000, "current": 780000, "unit": "元"},
-    {"name": "客户增长", "completion": 92, "target": 500, "current": 460, "unit": "个"},
-    {"name": "产品上线", "completion": 65, "target": 12, "current": 8, "unit": "个"},
-    {"name": "团队扩张", "completion": 45, "target": 50, "current": 23, "unit": "人"},
-    {"name": "用户满意度", "completion": 88, "target": 95, "current": 83.6, "unit": "%"},
-    {"name": "市场份额", "completion": 72, "target": 25, "current": 18, "unit": "%"},
-]
-
-EXPECTED_COLUMNS = ["目标名称", "当前值", "目标值", "完成率", "单位"]
-EXPECTED_COLUMNS_EN = ["name", "current", "target", "completion", "unit"]
+app.server.secret_key = secrets.token_hex(32)
 
 HISTORY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "history_snapshots.json")
+EXPECTED_COLUMNS = ["目标名称", "当前值", "目标值", "完成率", "单位"]
+EXPECTED_COLUMNS_EN = ["name", "current", "target", "completion", "unit"]
 
 
 def export_data_to_file(data, file_format="csv"):
@@ -181,7 +184,7 @@ def save_snapshot(data):
 
 def get_target_names(data=None):
     if data is None:
-        data = initial_mock_data
+        data = get_visible_targets()
     return [item["name"] for item in data]
 
 
@@ -375,10 +378,12 @@ def create_gauge_chart(data, alert_config=None):
     return fig
 
 
-def create_stats_card(data, alert_config=None):
+def create_stats_card(data, user_id=None, alert_config=None):
     is_alert = False
     alert_level = None
     card_class = "stat-card"
+
+    is_owner = user_id is not None and data.get("user_id") == user_id and data.get("id") is not None
 
     if alert_config and data["name"] in alert_config:
         threshold = alert_config[data["name"]]["threshold"]
@@ -419,6 +424,29 @@ def create_stats_card(data, alert_config=None):
             )
         ], className="progress-container")
     ]
+
+    if is_owner:
+        children.append(
+            html.Div([
+                html.Button(
+                    "✏️ 编辑",
+                    id={"type": "edit-target-btn", "index": data["id"]},
+                    className="target-action-btn target-edit-btn",
+                    n_clicks=0
+                ),
+                html.Button(
+                    "🗑️ 删除",
+                    id={"type": "delete-target-btn", "index": data["id"]},
+                    className="target-action-btn target-delete-btn",
+                    n_clicks=0
+                )
+            ], className="target-actions")
+        )
+
+    if not is_owner and data.get("is_public") == 1:
+        children.append(
+            html.Div("🌐 公开数据", className="target-public-badge")
+        )
 
     return html.Div(children, className=card_class)
 
@@ -475,61 +503,6 @@ def create_alert_history_panel(alert_logs):
     ], className="alert-history-panel")
 
 
-def create_alert_config_panel(alert_config):
-    config_rows = []
-    for target_name in get_target_names():
-        config = alert_config.get(target_name, DEFAULT_ALERT_CONFIG.get(target_name, {"threshold": 70, "level": "medium"}))
-        config_rows.append(
-            html.Div([
-                html.Div(target_name, className="alert-config-name"),
-                html.Div([
-                    html.Label("预警阈值 (%):", className="alert-config-label"),
-                    dcc.Input(
-                        id=f"threshold-{target_name}",
-                        type="number",
-                        min=0,
-                        max=100,
-                        value=config["threshold"],
-                        className="alert-config-threshold-input"
-                    )
-                ], className="alert-config-field"),
-                html.Div([
-                    html.Label("预警级别:", className="alert-config-label"),
-                    dcc.Dropdown(
-                        id=f"level-{target_name}",
-                        options=[
-                            {"label": "低预警", "value": "low"},
-                            {"label": "中预警", "value": "medium"},
-                            {"label": "高预警", "value": "high"}
-                        ],
-                        value=config["level"],
-                        clearable=False,
-                        className="alert-config-level-dropdown"
-                    )
-                ], className="alert-config-field")
-            ], className="alert-config-row")
-        )
-
-    return html.Div([
-        html.Div("⚙️ 预警配置", className="alert-config-title"),
-        html.Div("为每个目标设置独立的预警阈值和级别", className="alert-config-subtitle"),
-        html.Div(config_rows, className="alert-config-list"),
-        html.Button(
-            "💾 保存预警配置",
-            id="save-alert-config-btn",
-            className="save-alert-config-btn",
-            n_clicks=0
-        ),
-        html.Div(id="alert-config-status", className="alert-config-status")
-    ], className="alert-config-panel")
-
-
-initial_alert_config = load_alert_config()
-initial_triggered, initial_alert_logs = detect_and_log_alerts(
-    initial_mock_data, initial_alert_config, prev_triggered_names=None, is_initial_load=True
-)
-
-
 def create_alert_config_panel(alert_config, data=None):
     config_rows = []
     for target_name in get_target_names(data):
@@ -579,17 +552,269 @@ def create_alert_config_panel(alert_config, data=None):
     ], className="alert-config-panel")
 
 
+def create_auth_section(user_info):
+    if user_info is not None:
+        return html.Div([
+            html.Div([
+                html.Span("👤", className="user-status-icon"),
+                html.Span(f"{user_info['username']}", className="user-status-name"),
+                html.Span("已登录", className="user-status-tag")
+            ], className="user-status-info"),
+            html.Button(
+                "🚪 退出登录",
+                id="logout-btn",
+                className="auth-btn logout-btn",
+                n_clicks=0
+            )
+        ], className="user-status-section")
+    else:
+        return html.Div([
+            html.Button(
+                "🔐 登录",
+                id="show-login-btn",
+                className="auth-btn login-btn",
+                n_clicks=0
+            ),
+            html.Button(
+                "📝 注册",
+                id="show-register-btn",
+                className="auth-btn register-btn",
+                n_clicks=0
+            )
+        ], className="user-status-section")
+
+
+def create_login_modal():
+    return html.Div(id="login-modal-container", className="auth-modal-overlay hidden", children=[
+        html.Div(className="auth-modal", children=[
+            html.Div(className="auth-modal-header", children=[
+                html.Span("🔐 用户登录", className="auth-modal-title"),
+                html.Button("×", id="login-modal-close", className="auth-modal-close-btn")
+            ]),
+            html.Div(className="auth-modal-body", children=[
+                html.Div([
+                    html.Label("用户名:", className="auth-form-label"),
+                    dcc.Input(
+                        id="login-username",
+                        type="text",
+                        placeholder="请输入用户名",
+                        className="auth-form-input",
+                        value=""
+                    )
+                ], className="auth-form-group"),
+                html.Div([
+                    html.Label("密码:", className="auth-form-label"),
+                    dcc.Input(
+                        id="login-password",
+                        type="password",
+                        placeholder="请输入密码",
+                        className="auth-form-input",
+                        value=""
+                    )
+                ], className="auth-form-group"),
+                html.Button(
+                    "登 录",
+                    id="do-login-btn",
+                    className="auth-submit-btn",
+                    n_clicks=0
+                ),
+                html.Div(id="login-error-msg", className="auth-error-msg")
+            ])
+        ])
+    ])
+
+
+def create_register_modal():
+    return html.Div(id="register-modal-container", className="auth-modal-overlay hidden", children=[
+        html.Div(className="auth-modal", children=[
+            html.Div(className="auth-modal-header", children=[
+                html.Span("📝 用户注册", className="auth-modal-title"),
+                html.Button("×", id="register-modal-close", className="auth-modal-close-btn")
+            ]),
+            html.Div(className="auth-modal-body", children=[
+                html.Div([
+                    html.Label("用户名:", className="auth-form-label"),
+                    dcc.Input(
+                        id="register-username",
+                        type="text",
+                        placeholder="请输入用户名（3-20个字符）",
+                        className="auth-form-input",
+                        value=""
+                    )
+                ], className="auth-form-group"),
+                html.Div([
+                    html.Label("密码:", className="auth-form-label"),
+                    dcc.Input(
+                        id="register-password",
+                        type="password",
+                        placeholder="请输入密码（至少6位）",
+                        className="auth-form-input",
+                        value=""
+                    )
+                ], className="auth-form-group"),
+                html.Div([
+                    html.Label("确认密码:", className="auth-form-label"),
+                    dcc.Input(
+                        id="register-password2",
+                        type="password",
+                        placeholder="请再次输入密码",
+                        className="auth-form-input",
+                        value=""
+                    )
+                ], className="auth-form-group"),
+                html.Button(
+                    "注 册",
+                    id="do-register-btn",
+                    className="auth-submit-btn",
+                    n_clicks=0
+                ),
+                html.Div(id="register-error-msg", className="auth-error-msg")
+            ])
+        ])
+    ])
+
+
+def create_target_form_section(user_info):
+    if user_info is None:
+        return html.Div([
+            html.Div("💡 登录后可创建自己的目标", className="create-target-hint")
+        ], className="create-target-section")
+    return html.Div([
+        html.H2("➕ 创建新目标", className="section-title"),
+        html.Div([
+            html.Div([
+                html.Label("目标名称:", className="target-form-label"),
+                dcc.Input(
+                    id="new-target-name",
+                    type="text",
+                    placeholder="例如：季度销售额",
+                    className="target-form-input",
+                    value=""
+                )
+            ], className="target-form-group"),
+            html.Div([
+                html.Label("目标值:", className="target-form-label"),
+                dcc.Input(
+                    id="new-target-target",
+                    type="number",
+                    placeholder="目标数值",
+                    className="target-form-input",
+                    value=None,
+                    min=0
+                )
+            ], className="target-form-group"),
+            html.Div([
+                html.Label("当前值:", className="target-form-label"),
+                dcc.Input(
+                    id="new-target-current",
+                    type="number",
+                    placeholder="当前数值",
+                    className="target-form-input",
+                    value=None,
+                    min=0
+                )
+            ], className="target-form-group"),
+            html.Div([
+                html.Label("单位:", className="target-form-label"),
+                dcc.Input(
+                    id="new-target-unit",
+                    type="text",
+                    placeholder="例如：元、个、人、%",
+                    className="target-form-input",
+                    value=""
+                )
+            ], className="target-form-group"),
+            html.Div([
+                html.Label([
+                    dcc.Checklist(
+                        id="new-target-public",
+                        options=[{"label": "  设为公开（其他用户也能查看）", "value": "public"}],
+                        value=[],
+                        className="target-form-checkbox"
+                    )
+                ], className="target-form-label target-form-checkbox-label")
+            ], className="target-form-group target-form-group-full"),
+            html.Div([
+                html.Button(
+                    "✅ 创建目标",
+                    id="create-target-btn",
+                    className="create-target-submit-btn",
+                    n_clicks=0
+                )
+            ], className="target-form-group target-form-group-full")
+        ], className="target-form-grid"),
+        html.Div(id="create-target-status", className="create-target-status")
+    ], className="create-target-section")
+
+
+def create_edit_target_modal():
+    return html.Div(id="edit-target-modal-container", className="auth-modal-overlay hidden", children=[
+        html.Div(className="auth-modal", children=[
+            html.Div(className="auth-modal-header", children=[
+                html.Span("✏️ 编辑目标", className="auth-modal-title"),
+                html.Button("×", id="edit-target-modal-close", className="auth-modal-close-btn")
+            ]),
+            html.Div(className="auth-modal-body", children=[
+                dcc.Store(id="editing-target-id", data=None),
+                html.Div([
+                    html.Label("目标名称:", className="auth-form-label"),
+                    dcc.Input(id="edit-target-name", type="text", className="auth-form-input", value="")
+                ], className="auth-form-group"),
+                html.Div([
+                    html.Label("目标值:", className="auth-form-label"),
+                    dcc.Input(id="edit-target-target", type="number", className="auth-form-input", value=None, min=0)
+                ], className="auth-form-group"),
+                html.Div([
+                    html.Label("当前值:", className="auth-form-label"),
+                    dcc.Input(id="edit-target-current", type="number", className="auth-form-input", value=None, min=0)
+                ], className="auth-form-group"),
+                html.Div([
+                    html.Label("单位:", className="auth-form-label"),
+                    dcc.Input(id="edit-target-unit", type="text", className="auth-form-input", value="")
+                ], className="auth-form-group"),
+                html.Div([
+                    html.Label([
+                        dcc.Checklist(
+                            id="edit-target-public",
+                            options=[{"label": "  设为公开（其他用户也能查看）", "value": "public"}],
+                            value=[],
+                            className="target-form-checkbox"
+                        )
+                    ], className="auth-form-label target-form-checkbox-label")
+                ], className="auth-form-group"),
+                html.Button(
+                    "💾 保存修改",
+                    id="save-edit-target-btn",
+                    className="auth-submit-btn",
+                    n_clicks=0
+                ),
+                html.Div(id="edit-target-error-msg", className="auth-error-msg")
+            ])
+        ])
+    ])
+
+
+initial_alert_config = load_alert_config()
+initial_targets = get_visible_targets()
+initial_triggered, initial_alert_logs = detect_and_log_alerts(
+    initial_targets, initial_alert_config, prev_triggered_names=None, is_initial_load=True
+)
+
+
 app.layout = html.Div([
-    dcc.Store(id="targets-store", data=initial_mock_data),
+    dcc.Store(id="user-store", data=None),
+    dcc.Store(id="targets-store", data=initial_targets),
     dcc.Store(id="history-store", data=load_history()),
     dcc.Store(id="alert-config-store", data=initial_alert_config),
     dcc.Store(id="alert-logs-store", data=initial_alert_logs),
     dcc.Store(id="triggered-alerts-store", data=initial_triggered),
     dcc.Store(id="is-first-load", data=True),
+    dcc.Store(id="refresh-trigger", data=0),
     dcc.Download(id="download-data"),
     dcc.Interval(id="alert-interval", interval=30000, n_intervals=0),
 
     html.Div([
+        html.Div(id="auth-section", className="auth-section-container"),
         html.H1("🎯 目标完成进度监控", className="page-title"),
         html.Div(
             id="update-time-text",
@@ -608,12 +833,6 @@ app.layout = html.Div([
                     [html.Span("📄", className="btn-icon"), " 导出 CSV"],
                     id="export-csv-btn",
                     className="io-btn io-btn-csv",
-                    n_clicks=0
-                ),
-                html.Button(
-                    [html.Span("📤", className="btn-icon"), " 导入数据"],
-                    id="import-btn",
-                    className="io-btn io-btn-import",
                     n_clicks=0
                 ),
             ], className="io-buttons-group"),
@@ -659,12 +878,17 @@ app.layout = html.Div([
                 html.Div(id="error-modal-body", className="error-modal-body", children="")
             ])
         ]),
+        create_login_modal(),
+        create_register_modal(),
+        create_edit_target_modal(),
     ], className="header"),
 
     html.Div(id="alert-banner-container", children=create_alert_banner(initial_triggered)),
 
     html.Div([
         html.Div([
+            html.Div(id="create-target-container", children=create_target_form_section(None)),
+
             html.Div([
                 html.Div(id="gauges-container", className="charts-grid"),
 
@@ -680,7 +904,7 @@ app.layout = html.Div([
                             html.Label("选择目标（可多选对比）：", className="trend-label"),
                             dcc.Dropdown(
                                 id="target-selector",
-                                options=[{"label": name, "value": name} for name in get_target_names()],
+                                options=[{"label": name, "value": name} for name in get_target_names(initial_targets)],
                                 value=[],
                                 multi=True,
                                 placeholder="请选择要查看的目标...",
@@ -693,10 +917,7 @@ app.layout = html.Div([
                     ], className="trend-header"),
                     dcc.Graph(
                         id="trend-chart",
-                        figure=create_trend_chart(
-                            [],
-                            load_history()
-                        ),
+                        figure=create_trend_chart([], load_history()),
                         config={'displayModeBar': True, 'displaylogo': False},
                         className="trend-chart-container"
                     )
@@ -704,7 +925,7 @@ app.layout = html.Div([
 
                 html.Div([
                     html.H2("⚙️ 预警阈值配置", className="section-title"),
-                    html.Div(id="alert-config-container", children=create_alert_config_panel(initial_alert_config, initial_mock_data))
+                    html.Div(id="alert-config-container", children=create_alert_config_panel(initial_alert_config, initial_targets))
                 ], className="alert-config-section")
             ], className="main-content"),
 
@@ -722,6 +943,302 @@ app.layout = html.Div([
 
 
 @app.callback(
+    Output("auth-section", "children"),
+    [Input("user-store", "data")]
+)
+def render_auth_section(user_data):
+    return create_auth_section(user_data)
+
+
+@app.callback(
+    Output("create-target-container", "children"),
+    [Input("user-store", "data")]
+)
+def render_create_target_section(user_data):
+    return create_target_form_section(user_data)
+
+
+@app.callback(
+    [Output("login-modal-container", "className"),
+     Output("register-modal-container", "className")],
+    [Input("show-login-btn", "n_clicks"),
+     Input("show-register-btn", "n_clicks"),
+     Input("login-modal-close", "n_clicks"),
+     Input("register-modal-close", "n_clicks"),
+     Input("do-login-btn", "n_clicks"),
+     Input("do-register-btn", "n_clicks")],
+    prevent_initial_call=True
+)
+def toggle_auth_modals(n_login_show, n_reg_show, n_login_close, n_reg_close, n_login_do, n_reg_do):
+    ctx = callback_context
+    if not ctx.triggered:
+        return ["auth-modal-overlay hidden", "auth-modal-overlay hidden"]
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    login_cls = "auth-modal-overlay hidden"
+    register_cls = "auth-modal-overlay hidden"
+    if trigger_id == "show-login-btn":
+        login_cls = "auth-modal-overlay"
+    elif trigger_id == "show-register-btn":
+        register_cls = "auth-modal-overlay"
+    return [login_cls, register_cls]
+
+
+@app.callback(
+    [Output("user-store", "data"),
+     Output("login-error-msg", "children"),
+     Output("login-username", "value"),
+     Output("login-password", "value")],
+    [Input("do-login-btn", "n_clicks"),
+     Input("logout-btn", "n_clicks")],
+    [State("login-username", "value"),
+     State("login-password", "value"),
+     State("user-store", "data")],
+    prevent_initial_call=False
+)
+def handle_login_logout(n_login, n_logout, username, password, current_user):
+    ctx = callback_context
+    if not ctx.triggered:
+        return no_update, "", "", ""
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if trigger_id == "logout-btn":
+        return None, "", "", ""
+
+    if trigger_id == "do-login-btn":
+        if not n_login or n_login == 0:
+            return no_update, "", username, password
+        if not username or not username.strip():
+            return no_update, html.Span("⚠️ 请输入用户名", className="auth-error-text"), username, password
+        if not password:
+            return no_update, html.Span("⚠️ 请输入密码", className="auth-error-text"), username, password
+        result = login_user(username.strip(), password)
+        if result["success"]:
+            user_data = {"user_id": result["user_id"], "username": result["username"]}
+            return user_data, "", "", ""
+        else:
+            return no_update, html.Span(f"⚠️ {result['error']}", className="auth-error-text"), username, password
+
+    return no_update, "", username, password
+
+
+@app.callback(
+    [Output("register-error-msg", "children"),
+     Output("register-username", "value"),
+     Output("register-password", "value"),
+     Output("register-password2", "value"),
+     Output("show-login-btn", "n_clicks")],
+    [Input("do-register-btn", "n_clicks")],
+    [State("register-username", "value"),
+     State("register-password", "value"),
+     State("register-password2", "value"),
+     State("show-login-btn", "n_clicks")],
+    prevent_initial_call=True
+)
+def handle_register(n_clicks, username, password, password2, n_login_show):
+    if not n_clicks or n_clicks == 0:
+        return no_update, username, password, password2, no_update
+    if not username or len(username.strip()) < 3 or len(username.strip()) > 20:
+        return html.Span("⚠️ 用户名长度应为3-20个字符", className="auth-error-text"), username, password, password2, no_update
+    if not password or len(password) < 6:
+        return html.Span("⚠️ 密码至少6位", className="auth-error-text"), username, password, password2, no_update
+    if password != password2:
+        return html.Span("⚠️ 两次输入的密码不一致", className="auth-error-text"), username, password, password2, no_update
+    result = register_user(username.strip(), password)
+    if result["success"]:
+        return html.Span("✅ 注册成功！请登录", className="auth-success-text"), "", "", "", (n_login_show or 0) + 1
+    else:
+        return html.Span(f"⚠️ {result['error']}", className="auth-error-text"), username, password, password2, no_update
+
+
+@app.callback(
+    [Output("targets-store", "data"),
+     Output("refresh-trigger", "data"),
+     Output("create-target-status", "children"),
+     Output("new-target-name", "value"),
+     Output("new-target-target", "value"),
+     Output("new-target-current", "value"),
+     Output("new-target-unit", "value"),
+     Output("new-target-public", "value")],
+    [Input("create-target-btn", "n_clicks"),
+     Input("user-store", "data"),
+     Input("refresh-trigger", "data")],
+    [State("new-target-name", "value"),
+     State("new-target-target", "value"),
+     State("new-target-current", "value"),
+     State("new-target-unit", "value"),
+     State("new-target-public", "value"),
+     State("refresh-trigger", "data")],
+    prevent_initial_call=False
+)
+def handle_target_create_and_refresh(n_create, user_data, refresh, name, target, current, unit, public, current_refresh):
+    ctx = callback_context
+    user_id = user_data["user_id"] if user_data else None
+    current_targets = get_visible_targets(user_id)
+
+    if not ctx.triggered:
+        return current_targets, 0, "", "", None, None, "", []
+
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if trigger_id == "user-store" or trigger_id == "refresh-trigger":
+        return current_targets, current_refresh or 0, no_update, no_update, no_update, no_update, no_update, no_update
+
+    if trigger_id == "create-target-btn":
+        if not n_create or n_create == 0:
+            return no_update, no_update, "", no_update, no_update, no_update, no_update, no_update
+        if not user_data:
+            return no_update, no_update, html.Span("⚠️ 请先登录", className="create-target-error"), no_update, no_update, no_update, no_update, no_update
+        if not name or not name.strip():
+            return no_update, no_update, html.Span("⚠️ 请填写目标名称", className="create-target-error"), no_update, no_update, no_update, no_update, no_update
+        if target is None or target <= 0:
+            return no_update, no_update, html.Span("⚠️ 目标值必须大于0", className="create-target-error"), no_update, no_update, no_update, no_update, no_update
+        if current is None or current < 0:
+            return no_update, no_update, html.Span("⚠️ 当前值不能小于0", className="create-target-error"), no_update, no_update, no_update, no_update, no_update
+
+        is_public = 1 if public and "public" in public else 0
+        created = create_target(name.strip(), float(target), float(current), unit.strip() if unit else "", user_id, is_public)
+        new_refresh = (current_refresh or 0) + 1
+        updated_targets = get_visible_targets(user_id)
+        success_msg = html.Div([
+            html.Span("✅", className="status-icon"),
+            f" 目标「{created['name']}」创建成功！完成率：{created['completion']}%"
+        ], className="create-target-success")
+        return updated_targets, new_refresh, success_msg, "", None, None, "", []
+
+    return current_targets, current_refresh or 0, "", no_update, no_update, no_update, no_update, no_update
+
+
+@app.callback(
+    [Output("edit-target-modal-container", "className"),
+     Output("editing-target-id", "data"),
+     Output("edit-target-name", "value"),
+     Output("edit-target-target", "value"),
+     Output("edit-target-current", "value"),
+     Output("edit-target-unit", "value"),
+     Output("edit-target-public", "value"),
+     Output("edit-target-error-msg", "children")],
+    [Input({"type": "edit-target-btn", "index": ALL}, "n_clicks"),
+     Input("edit-target-modal-close", "n_clicks"),
+     Input("save-edit-target-btn", "n_clicks")],
+    [State("editing-target-id", "data"),
+     State("edit-target-name", "value"),
+     State("edit-target-target", "value"),
+     State("edit-target-current", "value"),
+     State("edit-target-unit", "value"),
+     State("edit-target-public", "value"),
+     State("user-store", "data")],
+    prevent_initial_call=True
+)
+def handle_edit_target_modal(edit_clicks_list, close_clicks, save_clicks,
+                             editing_id, name, target, current, unit, public, user_data):
+    ctx = callback_context
+    if not ctx.triggered:
+        return ["auth-modal-overlay hidden", None, "", None, None, "", [], ""]
+
+    trigger = ctx.triggered[0]
+    trigger_prop = trigger["prop_id"]
+    trigger_value = trigger["value"]
+
+    if trigger_prop == "edit-target-modal-close.n_clicks":
+        return ["auth-modal-overlay hidden", None, "", None, None, "", [], ""]
+
+    if trigger_prop == "save-edit-target-btn.n_clicks":
+        if not save_clicks or save_clicks == 0:
+            return no_update
+        if not user_data:
+            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+                    html.Span("⚠️ 请先登录", className="auth-error-text")]
+        if editing_id is None:
+            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+                    html.Span("⚠️ 未选择目标", className="auth-error-text")]
+        if not name or not name.strip():
+            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+                    html.Span("⚠️ 请填写目标名称", className="auth-error-text")]
+        if target is None or target <= 0:
+            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+                    html.Span("⚠️ 目标值必须大于0", className="auth-error-text")]
+        if current is None or current < 0:
+            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+                    html.Span("⚠️ 当前值不能小于0", className="auth-error-text")]
+        is_public = 1 if public and "public" in public else 0
+        result = update_target(
+            editing_id, user_data["user_id"],
+            name=name.strip(),
+            target=float(target),
+            current=float(current),
+            unit=unit.strip() if unit else "",
+            is_public=is_public
+        )
+        if result["success"]:
+            return ["auth-modal-overlay hidden", None, "", None, None, "", [], ""]
+        else:
+            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+                    html.Span(f"⚠️ {result['error']}", className="auth-error-text")]
+
+    if "type" in trigger_prop and "edit-target-btn" in trigger_prop:
+        if not trigger_value or trigger_value == 0:
+            return no_update
+        try:
+            prop_dict = json.loads(trigger_prop.split(".")[0])
+            target_id_to_edit = prop_dict["index"]
+        except Exception:
+            return no_update
+        target_data = get_target_by_id(target_id_to_edit)
+        if target_data is None:
+            return no_update
+        if user_data and target_data["user_id"] == user_data["user_id"]:
+            public_val = ["public"] if target_data.get("is_public") == 1 else []
+            return [
+                "auth-modal-overlay",
+                target_id_to_edit,
+                target_data["name"],
+                target_data["target"],
+                target_data["current"],
+                target_data.get("unit", ""),
+                public_val,
+                ""
+            ]
+    return no_update
+
+
+@app.callback(
+    [Output("targets-store", "data", allow_duplicate=True),
+     Output("refresh-trigger", "data", allow_duplicate=True)],
+    [Input("save-edit-target-btn", "n_clicks"),
+     Input({"type": "delete-target-btn", "index": ALL}, "n_clicks")],
+    [State("user-store", "data"),
+     State("editing-target-id", "data"),
+     State("refresh-trigger", "data")],
+    prevent_initial_call=True
+)
+def handle_edit_delete_refresh(save_clicks, delete_clicks_list, user_data, editing_id, current_refresh):
+    ctx = callback_context
+    if not ctx.triggered:
+        return no_update
+    user_id = user_data["user_id"] if user_data else None
+    trigger = ctx.triggered[0]
+    trigger_prop = trigger["prop_id"]
+    trigger_value = trigger["value"]
+    refresh = current_refresh or 0
+
+    if trigger_prop == "save-edit-target-btn.n_clicks":
+        if save_clicks and save_clicks > 0 and user_id is not None and editing_id is not None:
+            return get_visible_targets(user_id), refresh + 1
+        return no_update
+
+    if "type" in trigger_prop and "delete-target-btn" in trigger_prop:
+        if trigger_value and trigger_value > 0 and user_id is not None:
+            try:
+                prop_dict = json.loads(trigger_prop.split(".")[0])
+                target_id = prop_dict["index"]
+                delete_target(target_id, user_id)
+                return get_visible_targets(user_id), refresh + 1
+            except Exception:
+                pass
+    return no_update
+
+
+@app.callback(
     Output("download-data", "data"),
     [Input("export-excel-btn", "n_clicks"),
      Input("export-csv-btn", "n_clicks")],
@@ -733,7 +1250,7 @@ def handle_export(n_excel, n_csv, current_data):
     if not ctx.triggered:
         return no_update
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    data = current_data or initial_mock_data
+    data = current_data or get_visible_targets()
     if trigger_id == "export-excel-btn":
         return export_data_to_file(data, "xlsx")
     elif trigger_id == "export-csv-btn":
@@ -763,37 +1280,37 @@ def toggle_import_modal(import_clicks, close_clicks, upload_contents):
 
 
 @app.callback(
-    [Output("targets-store", "data"),
-     Output("io-status", "children"),
-     Output("error-modal-container", "className"),
+    [Output("error-modal-container", "className"),
      Output("error-modal-body", "children"),
      Output("update-time-text", "children"),
      Output("alert-config-container", "children")],
     [Input("upload-data", "contents"),
-     Input("error-modal-close", "n_clicks")],
+     Input("error-modal-close", "n_clicks"),
+     Input("targets-store", "data")],
     [State("upload-data", "filename"),
-     State("targets-store", "data"),
      State("alert-config-store", "data")],
     prevent_initial_call=False
 )
-def handle_import(contents, close_clicks, filename, current_data, alert_config):
+def handle_data_updates(contents, close_clicks, targets_data, filename, alert_config):
     ctx = callback_context
+    config = alert_config or load_alert_config()
+    targets = targets_data or get_visible_targets()
 
     if not ctx.triggered:
-        config = alert_config or load_alert_config()
         return (
-            initial_mock_data,
-            "",
             "error-modal-overlay hidden",
             "",
             f"数据更新时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-            create_alert_config_panel(config, initial_mock_data)
+            create_alert_config_panel(config, targets)
         )
 
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
     if trigger_id == "error-modal-close":
-        return no_update, "", "error-modal-overlay hidden", "", no_update, no_update
+        return "error-modal-overlay hidden", "", no_update, no_update
+
+    if trigger_id == "targets-store":
+        return no_update, "", f"数据更新时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", create_alert_config_panel(config, targets)
 
     if trigger_id == "upload-data" and contents is not None:
         parsed, error = parse_uploaded_file(contents, filename)
@@ -802,23 +1319,10 @@ def handle_import(contents, close_clicks, filename, current_data, alert_config):
                 html.Div("导入失败，具体错误如下：", className="error-modal-intro"),
                 html.Pre(error, className="error-modal-detail")
             ]
-            return no_update, "", "error-modal-overlay", error_children, no_update, no_update
+            return "error-modal-overlay", error_children, no_update, no_update
+        return no_update, "", f"数据更新时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", create_alert_config_panel(config, targets)
 
-        config = alert_config or load_alert_config()
-        success = html.Div([
-            html.Span("✅", className="status-icon"),
-            f" 成功导入 {len(parsed)} 条目标数据！"
-        ], className="io-success")
-        return (
-            parsed,
-            success,
-            "error-modal-overlay hidden",
-            "",
-            f"数据更新时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-            create_alert_config_panel(config, parsed)
-        )
-
-    return no_update, "", "error-modal-overlay hidden", "", no_update, no_update
+    return no_update, "", no_update, no_update
 
 
 @app.callback(
@@ -835,7 +1339,7 @@ def handle_import(contents, close_clicks, filename, current_data, alert_config):
 )
 def handle_trend_updates(n_clicks, selected_targets, current_targets, current_history):
     ctx = callback_context
-    targets = current_targets or initial_mock_data
+    targets = current_targets or get_visible_targets()
     options = [{"label": name, "value": name} for name in get_target_names(targets)]
 
     if not ctx.triggered:
@@ -878,19 +1382,21 @@ def handle_trend_updates(n_clicks, selected_targets, current_targets, current_hi
      Input("targets-store", "data")],
     [State("alert-logs-store", "data"),
      State("triggered-alerts-store", "data"),
-     State("is-first-load", "data")],
+     State("is-first-load", "data"),
+     State("user-store", "data")],
     prevent_initial_call=False
 )
-def handle_alert_detection(alert_config, n_intervals, current_targets, current_logs, prev_triggered, is_first_load):
+def handle_alert_detection(alert_config, n_intervals, current_targets, current_logs, prev_triggered, is_first_load, user_data):
     ctx = callback_context
     config = alert_config or load_alert_config()
-    targets = current_targets or initial_mock_data
+    targets = current_targets or get_visible_targets()
+    user_id = user_data["user_id"] if user_data else None
 
     if not ctx.triggered:
         triggered = check_alerts(targets, config)
         logs = current_logs or load_alert_logs()
         banner = create_alert_banner(triggered)
-        stats_children = [create_stats_card(data, config) for data in targets]
+        stats_children = [create_stats_card(data, user_id, config) for data in targets]
         gauge_children = [
             html.Div([
                 dcc.Graph(
@@ -912,7 +1418,7 @@ def handle_alert_detection(alert_config, n_intervals, current_targets, current_l
     )
 
     banner = create_alert_banner(triggered)
-    stats_children = [create_stats_card(data, config) for data in targets]
+    stats_children = [create_stats_card(data, user_id, config) for data in targets]
     gauge_children = [
         html.Div([
             dcc.Graph(
@@ -982,7 +1488,39 @@ def handle_alert_config_save(n_clicks, thresholds, threshold_ids, levels, level_
     return new_config, status
 
 
+@app.callback(
+    Output("io-status", "children"),
+    [Input("upload-data", "contents")],
+    [State("upload-data", "filename"),
+     State("user-store", "data")],
+    prevent_initial_call=True
+)
+def handle_import_status(contents, filename, user_data):
+    if contents is None:
+        return no_update
+    parsed, error = parse_uploaded_file(contents, filename)
+    if error:
+        return no_update
+    if user_data:
+        for item in parsed:
+            create_target(
+                item["name"], item["target"], item["current"], item.get("unit", ""),
+                user_data["user_id"], is_public=0
+            )
+        success = html.Div([
+            html.Span("✅", className="status-icon"),
+            f" 成功导入并创建 {len(parsed)} 条目标数据！"
+        ], className="io-success")
+        return success
+    else:
+        success = html.Div([
+            html.Span("✅", className="status-icon"),
+            f" 成功解析 {len(parsed)} 条目标数据！（登录后可导入创建为自己的目标）"
+        ], className="io-success")
+        return success
+
+
 if __name__ == "__main__":
     print("正在启动目标完成进度页面...")
-    print("访问地址：http://127.0.0.1:8050")
-    app.run(debug=True, host="127.0.0.1", port=8050)
+    print("访问地址：http://127.0.0.1:8051")
+    app.run(debug=False, host="127.0.0.1", port=8051)
