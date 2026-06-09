@@ -1,0 +1,26 @@
+{
+  "年度销售目标": {
+    "threshold": 80,
+    "level": "medium"
+  },
+  "客户增长": {
+    "threshold": 85,
+    "level": "low"
+  },
+  "产品上线": {
+    "threshold": 70,
+    "level": "medium"
+  },
+  "团队扩张": {
+    "threshold": 60,
+    "level": "high"
+  },
+  "用户满意度": {
+    "threshold": 90,
+    "level": "low"
+  },
+  "市场份额": {
+    "threshold": 75,
+    "level": "medium"
+  }
+}
