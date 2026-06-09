@@ -5,6 +5,17 @@ from datetime import datetime
 import json
 import os
 
+from alert_module import (
+    ALERT_LEVELS,
+    DEFAULT_ALERT_CONFIG,
+    load_alert_config,
+    save_alert_config,
+    load_alert_logs,
+    check_alerts,
+    add_alert_log,
+    detect_and_log_alerts
+)
+
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 app.title = "目标完成进度监控"
 
@@ -17,85 +28,7 @@ mock_data = [
     {"name": "市场份额", "completion": 72, "target": 25, "current": 18, "unit": "%"},
 ]
 
-ALERT_LEVELS = {
-    "low": {"name": "低预警", "color": "#FFB300", "border_color": "#FFB300"},
-    "medium": {"name": "中预警", "color": "#FF9100", "border_color": "#FF6D00"},
-    "high": {"name": "高预警", "color": "#FF5252", "border_color": "#D50000"},
-}
-
-DEFAULT_ALERT_CONFIG = {
-    "年度销售目标": {"threshold": 80, "level": "medium"},
-    "客户增长": {"threshold": 85, "level": "low"},
-    "产品上线": {"threshold": 70, "level": "medium"},
-    "团队扩张": {"threshold": 60, "level": "high"},
-    "用户满意度": {"threshold": 90, "level": "low"},
-    "市场份额": {"threshold": 75, "level": "medium"},
-}
-
-ALERT_CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "alert_config.json")
-ALERT_LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "alert_logs.json")
 HISTORY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "history_snapshots.json")
-
-
-def load_alert_config():
-    if os.path.exists(ALERT_CONFIG_FILE):
-        try:
-            with open(ALERT_CONFIG_FILE, "r", encoding="utf-8") as f:
-                config = json.load(f)
-                for key in DEFAULT_ALERT_CONFIG:
-                    if key not in config:
-                        config[key] = DEFAULT_ALERT_CONFIG[key]
-                return config
-        except (json.JSONDecodeError, IOError):
-            return dict(DEFAULT_ALERT_CONFIG)
-    return dict(DEFAULT_ALERT_CONFIG)
-
-
-def save_alert_config(config):
-    with open(ALERT_CONFIG_FILE, "w", encoding="utf-8") as f:
-        json.dump(config, f, ensure_ascii=False, indent=2)
-
-
-def load_alert_logs():
-    if os.path.exists(ALERT_LOG_FILE):
-        try:
-            with open(ALERT_LOG_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except (json.JSONDecodeError, IOError):
-            return []
-    return []
-
-
-def save_alert_log(logs):
-    with open(ALERT_LOG_FILE, "w", encoding="utf-8") as f:
-        json.dump(logs, f, ensure_ascii=False, indent=2)
-
-
-def check_alerts(data, config):
-    triggered = []
-    for item in data:
-        name = item["name"]
-        if name in config:
-            threshold = config[name]["threshold"]
-            level = config[name]["level"]
-            if item["completion"] < threshold:
-                triggered.append({
-                    "name": name,
-                    "completion": item["completion"],
-                    "threshold": threshold,
-                    "level": level,
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                })
-    return triggered
-
-
-def add_alert_log(triggered_alerts):
-    logs = load_alert_logs()
-    for alert in triggered_alerts:
-        logs.insert(0, alert)
-    logs = logs[:100]
-    save_alert_log(logs)
-    return logs
 
 
 def load_history():
@@ -127,7 +60,7 @@ def get_target_names():
 def create_trend_chart(selected_targets, history):
     fig = go.Figure()
     colors = ["#667eea", "#764ba2", "#00C853", "#FFB300", "#FF5252", "#00BCD4"]
-    
+
     if not selected_targets:
         fig.add_annotation(
             text="请从上方下拉框选择要查看的目标",
@@ -142,7 +75,7 @@ def create_trend_chart(selected_targets, history):
             plot_bgcolor="white",
         )
         return fig
-    
+
     if not history:
         fig.add_annotation(
             text="暂无历史数据，请点击上方按钮保存快照",
@@ -157,7 +90,7 @@ def create_trend_chart(selected_targets, history):
             plot_bgcolor="white",
         )
         return fig
-    
+
     for idx, target_name in enumerate(selected_targets):
         timestamps = []
         completions = []
@@ -167,7 +100,7 @@ def create_trend_chart(selected_targets, history):
                     timestamps.append(snapshot["timestamp"])
                     completions.append(target["completion"])
                     break
-        
+
         if timestamps:
             color = colors[idx % len(colors)]
             fig.add_trace(go.Scatter(
@@ -181,7 +114,7 @@ def create_trend_chart(selected_targets, history):
                               "时间：%{x}<br>" +
                               "完成率：%{y}%<extra></extra>"
             ))
-    
+
     fig.update_layout(
         height=450,
         margin={"l": 60, "r": 30, "t": 50, "b": 80},
@@ -215,8 +148,9 @@ def create_trend_chart(selected_targets, history):
         ),
         hovermode="x unified"
     )
-    
+
     return fig
+
 
 def create_gauge_chart(data, alert_config=None):
     completion = data["completion"]
@@ -229,8 +163,8 @@ def create_gauge_chart(data, alert_config=None):
             is_alert = True
             alert_level = alert_config[data["name"]]["level"]
 
-    if is_alert and alert_level:
-        color = ALERT_LEVELS[alert_level]["color"]
+    if is_alert:
+        color = "#FF5252"
     elif completion >= 90:
         color = "#00C853"
     elif completion >= 70:
@@ -242,7 +176,7 @@ def create_gauge_chart(data, alert_config=None):
 
     title_text = f"<b>{data['name']}</b>"
     if is_alert:
-        title_text += f"<br><span style='color:{ALERT_LEVELS[alert_level]['color']};font-size:12px'>⚠ {ALERT_LEVELS[alert_level]['name']}</span>"
+        title_text += f"<br><span style='color:#D50000;font-size:12px'>⚠ {ALERT_LEVELS[alert_level]['name']}</span>"
 
     fig = go.Figure(go.Indicator(
         mode="gauge+number+delta",
@@ -297,7 +231,7 @@ def create_gauge_chart(data, alert_config=None):
             xref="paper",
             yref="paper",
             line=dict(
-                color=ALERT_LEVELS[alert_level]["color"],
+                color="#D50000",
                 width=3,
                 dash="dash"
             )
@@ -323,14 +257,14 @@ def create_stats_card(data, alert_config=None):
         if data["completion"] < threshold:
             is_alert = True
             alert_level = alert_config[data["name"]]["level"]
-            card_class = f"stat-card alert-card alert-{alert_level}"
+            card_class = "stat-card alert-card alert-active"
 
     children = [
         html.Div([
             html.Span(data["name"], className="stat-name"),
             html.Span(
                 f"⚠ {ALERT_LEVELS[alert_level]['name']}",
-                className=f"alert-badge alert-badge-{alert_level}"
+                className="alert-badge alert-badge-active"
             )
         ], className="stat-name-row") if is_alert else html.Div(data["name"], className="stat-name"),
         html.Div(
@@ -352,7 +286,7 @@ def create_stats_card(data, alert_config=None):
                 className=f"progress-bar{' alert-progress-bar' if is_alert else ''}",
                 style={
                     'width': f"{data['completion']}%",
-                    'background': f"linear-gradient(90deg, {ALERT_LEVELS[alert_level]['color']} 0%, {ALERT_LEVELS[alert_level]['border_color']} 100%)" if is_alert and alert_level else None
+                    'background': "linear-gradient(90deg, #FF5252 0%, #D50000 100%)" if is_alert else None
                 }
             )
         ], className="progress-container")
@@ -392,11 +326,10 @@ def create_alert_history_panel(alert_logs):
     else:
         history_items = []
         for idx, log in enumerate(recent_logs):
-            level_info = ALERT_LEVELS.get(log.get("level", "medium"), ALERT_LEVELS["medium"])
             history_items.append(
                 html.Div([
                     html.Div([
-                        html.Span("⚠", className=f"alert-history-icon alert-history-icon-{log.get('level', 'medium')}"),
+                        html.Span("⚠", className="alert-history-icon alert-history-icon-active"),
                         html.Span(log["name"], className="alert-history-name"),
                     ], className="alert-history-header"),
                     html.Div([
@@ -404,7 +337,7 @@ def create_alert_history_panel(alert_logs):
                         html.Span(f" / 阈值: {log['threshold']}%", className="alert-history-threshold"),
                     ], className="alert-history-values"),
                     html.Div(log.get("timestamp", ""), className="alert-history-time")
-                ], className=f"alert-history-item alert-history-item-{log.get('level', 'medium')}")
+                ], className="alert-history-item alert-history-item-active")
             )
 
     return html.Div([
@@ -464,8 +397,9 @@ def create_alert_config_panel(alert_config):
 
 
 initial_alert_config = load_alert_config()
-initial_triggered = check_alerts(mock_data, initial_alert_config)
-initial_alert_logs = load_alert_logs()
+initial_triggered, initial_alert_logs = detect_and_log_alerts(
+    mock_data, initial_alert_config, prev_triggered_names=None, is_initial_load=True
+)
 
 
 app.layout = html.Div([
@@ -473,6 +407,7 @@ app.layout = html.Div([
     dcc.Store(id="alert-config-store", data=initial_alert_config),
     dcc.Store(id="alert-logs-store", data=initial_alert_logs),
     dcc.Store(id="triggered-alerts-store", data=initial_triggered),
+    dcc.Store(id="is-first-load", data=True),
     dcc.Interval(id="alert-interval", interval=30000, n_intervals=0),
 
     html.Div([
@@ -503,7 +438,7 @@ app.layout = html.Div([
                             config={'displayModeBar': False},
                             className="gauge-chart"
                         )
-                    ], className=f"chart-container{' alert-chart-container alert-chart-' + initial_alert_config[data['name']]['level'] if data['name'] in initial_alert_config and data['completion'] < initial_alert_config[data['name']]['threshold'] else ''}")
+                    ], className=f"chart-container{' alert-chart-container' if data['name'] in initial_alert_config and data['completion'] < initial_alert_config[data['name']]['threshold'] else ''}")
                     for idx, data in enumerate(mock_data)
                 ], className="charts-grid"),
 
@@ -645,33 +580,40 @@ def handle_alert_config_save(n_clicks, *args):
     [Output("alert-banner-container", "children"),
      Output("alert-logs-store", "data"),
      Output("triggered-alerts-store", "data"),
-     Output("stats-container", "children")] +
+     Output("stats-container", "children"),
+     Output("is-first-load", "data")] +
     [Output(f"gauge-{idx}", "figure") for idx in range(len(mock_data))],
     [Input("alert-config-store", "data"),
      Input("alert-interval", "n_intervals")],
     [State("alert-logs-store", "data"),
-     State("triggered-alerts-store", "data")],
+     State("triggered-alerts-store", "data"),
+     State("is-first-load", "data")],
     prevent_initial_call=False
 )
-def handle_alert_detection(alert_config, n_intervals, current_logs, prev_triggered):
+def handle_alert_detection(alert_config, n_intervals, current_logs, prev_triggered, is_first_load):
+    ctx = callback_context
     config = alert_config or load_alert_config()
-    triggered = check_alerts(mock_data, config)
 
+    if not ctx.triggered:
+        triggered = check_alerts(mock_data, config)
+        logs = current_logs or load_alert_logs()
+        banner = create_alert_banner(triggered)
+        stats_children = [create_stats_card(data, config) for data in mock_data]
+        gauge_figures = [create_gauge_chart(data, config) for data in mock_data]
+        return [banner, logs, triggered, stats_children, False] + gauge_figures
+
+    _is_initial = is_first_load if is_first_load is not None else False
     prev_names = set(a["name"] for a in (prev_triggered or []))
-    new_triggered = [a for a in triggered if a["name"] not in prev_names]
 
-    if new_triggered:
-        updated_logs = add_alert_log(new_triggered)
-    else:
-        updated_logs = current_logs or load_alert_logs()
+    triggered, updated_logs = detect_and_log_alerts(
+        mock_data, config, prev_triggered_names=prev_names, is_initial_load=_is_initial
+    )
 
     banner = create_alert_banner(triggered)
-
     stats_children = [create_stats_card(data, config) for data in mock_data]
-
     gauge_figures = [create_gauge_chart(data, config) for data in mock_data]
 
-    return [banner, updated_logs, triggered, stats_children] + gauge_figures
+    return [banner, updated_logs, triggered, stats_children, False] + gauge_figures
 
 
 @app.callback(
