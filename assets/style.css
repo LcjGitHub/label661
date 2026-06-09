@@ -3059,3 +3059,472 @@ body {
         align-items: flex-start;
     }
 }
+
+.subscription-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-top: 40px;
+}
+
+.subscription-panel {
+    padding: 0;
+}
+
+.subscription-title {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.subscription-subtitle {
+    font-size: 0.9em;
+    color: #888;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.subscription-hint {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-size: 1em;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+    border-radius: 10px;
+    border: 2px dashed #c3cfe2;
+}
+
+.subscription-empty {
+    text-align: center;
+    color: #999;
+    padding: 30px 0;
+    font-size: 0.95em;
+}
+
+.subscription-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.subscription-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+    padding: 20px;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f7fa 100%);
+    border-radius: 12px;
+    border-left: 4px solid #FF9800;
+    transition: all 0.3s ease;
+}
+
+.subscription-row:hover {
+    box-shadow: 0 2px 12px rgba(255, 152, 0, 0.15);
+}
+
+.subscription-target-info {
+    flex: 0 0 200px;
+}
+
+.subscription-target-name {
+    font-weight: bold;
+    color: #333;
+    font-size: 1em;
+    margin-bottom: 4px;
+}
+
+.subscription-target-progress {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.subscription-checkboxes,
+.subscription-custom-group,
+.subscription-drop-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sub-checkbox-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    cursor: pointer;
+    color: #555;
+    font-size: 0.9em;
+}
+
+.sub-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sub-checkbox label {
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.sub-custom-input {
+    width: 80px;
+    padding: 6px 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.sub-custom-input:focus {
+    outline: none;
+    border-color: #FF9800;
+    box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+}
+
+.sub-custom-input:disabled {
+    background: #f5f5f5;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+.subscription-actions {
+    margin-left: auto;
+}
+
+.save-sub-btn {
+    padding: 8px 20px;
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 12px rgba(255, 152, 0, 0.35);
+    font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+}
+
+.save-sub-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 18px rgba(255, 152, 0, 0.5);
+    background: linear-gradient(135deg, #F57C00 0%, #EF6C00 100%);
+}
+
+.save-sub-btn:active {
+    transform: translateY(0);
+}
+
+.subscription-status {
+    margin-top: 15px;
+    min-height: 24px;
+}
+
+.notification-badge-wrapper {
+    position: absolute;
+    top: 15px;
+    right: 90px;
+    z-index: 25;
+}
+
+.notification-badge-wrapper.hidden {
+    display: none !important;
+}
+
+.notification-badge {
+    position: relative;
+}
+
+.notification-toggle-btn {
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+    position: relative;
+}
+
+.notification-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.notification-bell-icon {
+    font-size: 1.1em;
+}
+
+.notification-count {
+    background: linear-gradient(135deg, #FF5252 0%, #D50000 100%);
+    color: white;
+    font-size: 0.75em;
+    font-weight: bold;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    animation: notifPulse 2s ease-in-out infinite;
+}
+
+@keyframes notifPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+.notification-panel {
+    position: fixed;
+    top: 60px;
+    right: 90px;
+    width: 400px;
+    max-width: calc(100vw - 120px);
+    max-height: 500px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: notifSlideDown 0.25s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.notification-panel.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+@keyframes notifSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notification-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: white;
+}
+
+.notification-panel-title {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.mark-all-read-btn {
+    padding: 5px 14px;
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 0.85em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+}
+
+.mark-all-read-btn:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.notification-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.notification-empty {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+    font-size: 0.95em;
+}
+
+.notification-item-wrapper {
+    cursor: pointer;
+}
+
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 12px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+    border-left: 4px solid #FF9800;
+    transition: all 0.2s ease;
+}
+
+.notification-item:hover {
+    transform: translateX(3px);
+    background: linear-gradient(135deg, #ffecb3 0%, #ffe082 100%);
+}
+
+.notification-item.notification-read {
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-left-color: #bdbdbd;
+    opacity: 0.8;
+}
+
+.notification-item.notification-read:hover {
+    background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+}
+
+.notification-item-icon {
+    font-size: 1.4em;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.notification-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-item-message {
+    font-size: 0.92em;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 6px;
+    word-break: break-word;
+}
+
+.notification-item-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-item-type {
+    font-size: 0.8em;
+    color: #F57C00;
+    font-weight: 500;
+    background: rgba(255, 152, 0, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.notification-item.notification-read .notification-item-type {
+    color: #757575;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.notification-item-time {
+    font-size: 0.78em;
+    color: #999;
+    font-family: 'Consolas', 'Courier New', monospace;
+}
+
+.notification-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 3px;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.notification-list::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+@media (max-width: 768px) {
+    .subscription-section {
+        padding: 20px 15px;
+    }
+
+    .subscription-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .subscription-target-info {
+        flex: none;
+        width: 100%;
+    }
+
+    .subscription-actions {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .save-sub-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .notification-badge-wrapper {
+        top: auto;
+        right: 20px;
+        bottom: 15px;
+    }
+
+    .notification-panel {
+        position: fixed;
+        top: auto;
+        right: 15px;
+        left: 15px;
+        bottom: 70px;
+        width: auto;
+        max-width: none;
+        max-height: 60vh;
+    }
+
+    .subscription-checkboxes,
+    .subscription-custom-group,
+    .subscription-drop-group {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .subscription-custom-group,
+    .subscription-drop-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sub-custom-input {
+        width: 100%;
+    }
+}

@@ -63,6 +63,53 @@ def init_db():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS user_subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            target_id INTEGER NOT NULL,
+            target_name TEXT NOT NULL,
+            threshold_50 INTEGER DEFAULT 0,
+            threshold_80 INTEGER DEFAULT 0,
+            threshold_100 INTEGER DEFAULT 0,
+            threshold_custom REAL,
+            notify_on_drop INTEGER DEFAULT 0,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (target_id) REFERENCES targets (id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS notification_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            target_id INTEGER NOT NULL,
+            target_name TEXT NOT NULL,
+            notification_type TEXT NOT NULL,
+            message TEXT NOT NULL,
+            completion REAL NOT NULL,
+            threshold REAL NOT NULL,
+            is_read INTEGER DEFAULT 0,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (target_id) REFERENCES targets (id)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS subscription_triggered (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            target_id INTEGER NOT NULL,
+            notification_type TEXT NOT NULL,
+            triggered_at TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users (id),
+            FOREIGN KEY (target_id) REFERENCES targets (id)
+        )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -705,6 +752,249 @@ def calculate_comparison_metrics(targets_data, history_data=None):
             r["disadvantages"] = disadvantages
 
     return results
+
+
+def row_to_subscription_dict(row):
+    return {
+        "id": row["id"],
+        "user_id": row["user_id"],
+        "target_id": row["target_id"],
+        "target_name": row["target_name"],
+        "threshold_50": bool(row["threshold_50"]),
+        "threshold_80": bool(row["threshold_80"]),
+        "threshold_100": bool(row["threshold_100"]),
+        "threshold_custom": row["threshold_custom"],
+        "notify_on_drop": bool(row["notify_on_drop"]),
+        "created_at": row["created_at"],
+        "updated_at": row["updated_at"]
+    }
+
+
+def row_to_notification_dict(row):
+    return {
+        "id": row["id"],
+        "user_id": row["user_id"],
+        "target_id": row["target_id"],
+        "target_name": row["target_name"],
+        "notification_type": row["notification_type"],
+        "message": row["message"],
+        "completion": row["completion"],
+        "threshold": row["threshold"],
+        "is_read": bool(row["is_read"]),
+        "created_at": row["created_at"]
+    }
+
+
+def create_subscription(user_id, target_id, target_name, threshold_50=False, threshold_80=False,
+                        threshold_100=False, threshold_custom=None, notify_on_drop=False):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT id FROM user_subscriptions WHERE user_id = ? AND target_id = ?",
+        (user_id, target_id)
+    )
+    existing = cursor.fetchone()
+
+    if existing:
+        cursor.execute(
+            """UPDATE user_subscriptions
+               SET threshold_50 = ?, threshold_80 = ?, threshold_100 = ?,
+                   threshold_custom = ?, notify_on_drop = ?, updated_at = ?
+               WHERE id = ?""",
+            (1 if threshold_50 else 0, 1 if threshold_80 else 0, 1 if threshold_100 else 0,
+             threshold_custom, 1 if notify_on_drop else 0, now, existing["id"])
+        )
+        sub_id = existing["id"]
+    else:
+        cursor.execute(
+            """INSERT INTO user_subscriptions
+               (user_id, target_id, target_name, threshold_50, threshold_80, threshold_100,
+                threshold_custom, notify_on_drop, created_at, updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (user_id, target_id, target_name,
+             1 if threshold_50 else 0, 1 if threshold_80 else 0, 1 if threshold_100 else 0,
+             threshold_custom, 1 if notify_on_drop else 0, now, now)
+        )
+        sub_id = cursor.lastrowid
+
+    conn.commit()
+    conn.close()
+    return get_subscription_by_id(sub_id)
+
+
+def get_subscription_by_id(sub_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM user_subscriptions WHERE id = ?", (sub_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return row_to_subscription_dict(row)
+    return None
+
+
+def get_user_subscriptions(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM user_subscriptions WHERE user_id = ? ORDER BY updated_at DESC",
+        (user_id,)
+    )
+    rows = cursor.fetchall()
+    conn.close()
+    return [row_to_subscription_dict(r) for r in rows]
+
+
+def get_subscription_by_user_target(user_id, target_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM user_subscriptions WHERE user_id = ? AND target_id = ?",
+        (user_id, target_id)
+    )
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return row_to_subscription_dict(row)
+    return None
+
+
+def delete_subscription(user_id, subscription_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "DELETE FROM user_subscriptions WHERE id = ? AND user_id = ?",
+        (subscription_id, user_id)
+    )
+    deleted = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    return deleted
+
+
+def create_notification_log(user_id, target_id, target_name, notification_type,
+                            message, completion, threshold):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """INSERT INTO notification_logs
+           (user_id, target_id, target_name, notification_type, message,
+            completion, threshold, is_read, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)""",
+        (user_id, target_id, target_name, notification_type, message,
+         completion, threshold, now)
+    )
+    log_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return get_notification_by_id(log_id)
+
+
+def get_notification_by_id(log_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM notification_logs WHERE id = ?", (log_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return row_to_notification_dict(row)
+    return None
+
+
+def get_user_notifications(user_id, unread_only=False, limit=50):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    if unread_only:
+        cursor.execute(
+            "SELECT * FROM notification_logs WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC LIMIT ?",
+            (user_id, limit)
+        )
+    else:
+        cursor.execute(
+            "SELECT * FROM notification_logs WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
+            (user_id, limit)
+        )
+    rows = cursor.fetchall()
+    conn.close()
+    return [row_to_notification_dict(r) for r in rows]
+
+
+def mark_notification_read(user_id, notification_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE notification_logs SET is_read = 1 WHERE id = ? AND user_id = ?",
+        (notification_id, user_id)
+    )
+    updated = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    return updated
+
+
+def mark_all_notifications_read(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE notification_logs SET is_read = 1 WHERE user_id = ?",
+        (user_id,)
+    )
+    count = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return count
+
+
+def has_triggered(user_id, target_id, notification_type):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id FROM subscription_triggered WHERE user_id = ? AND target_id = ? AND notification_type = ?",
+        (user_id, target_id, notification_type)
+    )
+    row = cursor.fetchone()
+    conn.close()
+    return row is not None
+
+
+def record_triggered(user_id, target_id, notification_type):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """INSERT OR IGNORE INTO subscription_triggered
+           (user_id, target_id, notification_type, triggered_at)
+           VALUES (?, ?, ?, ?)""",
+        (user_id, target_id, notification_type, now)
+    )
+    conn.commit()
+    conn.close()
+
+
+def clear_triggered(user_id, target_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "DELETE FROM subscription_triggered WHERE user_id = ? AND target_id = ?",
+        (user_id, target_id)
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_unread_notification_count(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT COUNT(*) as cnt FROM notification_logs WHERE user_id = ? AND is_read = 0",
+        (user_id,)
+    )
+    row = cursor.fetchone()
+    conn.close()
+    return row["cnt"] if row else 0
 
 
 init_db()

@@ -46,7 +46,21 @@ from database import (
     get_ranking_targets,
     get_targets_by_ids,
     get_targets_by_names,
-    calculate_comparison_metrics
+    calculate_comparison_metrics,
+    create_subscription,
+    get_user_subscriptions,
+    get_subscription_by_user_target,
+    delete_subscription,
+    get_user_notifications,
+    mark_notification_read,
+    mark_all_notifications_read,
+    get_unread_notification_count,
+)
+
+from notification_module import (
+    NOTIFICATION_TYPES,
+    get_notification_display,
+    check_and_trigger_notifications,
 )
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
@@ -1841,11 +1855,187 @@ def create_sync_error_toast(error_message):
     ], className="sync-error-toast")
 
 
+def create_notification_badge(user_info):
+    if user_info is None:
+        return html.Div(className="notification-badge-wrapper hidden")
+    unread_count = get_unread_notification_count(user_info["user_id"])
+    badge_class = "notification-badge notification-badge-has" if unread_count > 0 else "notification-badge"
+    return html.Div([
+        html.Button(
+            [
+                html.Span("🔔", className="notification-bell-icon"),
+                html.Span(str(unread_count), className="notification-count") if unread_count > 0 else None
+            ],
+            id="toggle-notification-btn",
+            className="notification-toggle-btn",
+            n_clicks=0
+        )
+    ], className=badge_class)
+
+
+def create_notification_panel(notifications, user_info):
+    if user_info is None:
+        return html.Div(className="notification-panel hidden", id="notification-panel")
+
+    if not notifications:
+        items = html.Div("暂无通知消息", className="notification-empty")
+    else:
+        items = []
+        for notif in notifications:
+            type_info = NOTIFICATION_TYPES.get(notif["notification_type"], {"icon": "📩", "name": "通知"})
+            read_class = " notification-read" if notif["is_read"] else ""
+            items.append(
+                html.Div([
+                    html.Div([
+                        html.Span(type_info["icon"], className="notification-item-icon"),
+                        html.Div([
+                            html.Div(notif["message"], className="notification-item-message"),
+                            html.Div([
+                                html.Span(type_info["name"], className="notification-item-type"),
+                                html.Span(notif["created_at"], className="notification-item-time")
+                            ], className="notification-item-meta")
+                        ], className="notification-item-content")
+                    ], className=f"notification-item{read_class}",
+                        id={"type": "notification-item", "index": notif["id"]}
+                    )
+                ], className="notification-item-wrapper")
+            )
+
+    return html.Div([
+        html.Div([
+            html.Div("🔔 我的通知", className="notification-panel-title"),
+            html.Button(
+                "全部已读",
+                id="mark-all-read-btn",
+                className="mark-all-read-btn",
+                n_clicks=0
+            )
+        ], className="notification-panel-header"),
+        html.Div(items, className="notification-list", id="notification-list")
+    ], className="notification-panel hidden", id="notification-panel")
+
+
+def create_subscription_panel(subscriptions, targets_data, user_info):
+    if user_info is None:
+        return html.Div([
+            html.Div("🔔 提醒订阅管理", className="subscription-title"),
+            html.Div("💡 登录后可订阅目标状态变更通知", className="subscription-hint")
+        ], className="subscription-panel")
+
+    sub_map = {}
+    for sub in (subscriptions or []):
+        sub_map[sub["target_id"]] = sub
+
+    visible_targets = targets_data or get_visible_targets(user_info["user_id"])
+
+    if not visible_targets:
+        return html.Div([
+            html.Div("🔔 提醒订阅管理", className="subscription-title"),
+            html.Div("暂无可用目标", className="subscription-empty")
+        ], className="subscription-panel")
+
+    config_rows = []
+    for target in visible_targets:
+        tid = target.get("id")
+        tname = target["name"]
+        tcompletion = target["completion"]
+        sub = sub_map.get(tid, {})
+
+        t50_val = sub.get("threshold_50", False)
+        t80_val = sub.get("threshold_80", False)
+        t100_val = sub.get("threshold_100", False)
+        tcustom_val = sub.get("threshold_custom")
+        tdrop_val = sub.get("notify_on_drop", False)
+
+        config_rows.append(
+            html.Div([
+                html.Div([
+                    html.Div(tname, className="subscription-target-name"),
+                    html.Div(f"当前完成度: {tcompletion}%", className="subscription-target-progress")
+                ], className="subscription-target-info"),
+                html.Div([
+                    html.Label([
+                        dcc.Checklist(
+                            id={"type": "sub-threshold-50", "index": tid},
+                            options=[{"label": "  完成度达 50%", "value": "50"}],
+                            value=["50"] if t50_val else [],
+                            className="sub-checkbox"
+                        )
+                    ], className="sub-checkbox-label"),
+                    html.Label([
+                        dcc.Checklist(
+                            id={"type": "sub-threshold-80", "index": tid},
+                            options=[{"label": "  完成度达 80%", "value": "80"}],
+                            value=["80"] if t80_val else [],
+                            className="sub-checkbox"
+                        )
+                    ], className="sub-checkbox-label"),
+                    html.Label([
+                        dcc.Checklist(
+                            id={"type": "sub-threshold-100", "index": tid},
+                            options=[{"label": "  完成度达 100%", "value": "100"}],
+                            value=["100"] if t100_val else [],
+                            className="sub-checkbox"
+                        )
+                    ], className="sub-checkbox-label"),
+                ], className="subscription-checkboxes"),
+                html.Div([
+                    html.Label([
+                        dcc.Checklist(
+                            id={"type": "sub-threshold-custom", "index": tid},
+                            options=[{"label": "  自定义阈值:", "value": "custom"}],
+                            value=["custom"] if tcustom_val else [],
+                            className="sub-checkbox"
+                        )
+                    ], className="sub-checkbox-label"),
+                    dcc.Input(
+                        id={"type": "sub-custom-value", "index": tid},
+                        type="number",
+                        min=0,
+                        max=100,
+                        value=tcustom_val if tcustom_val else None,
+                        placeholder="0-100",
+                        className="sub-custom-input",
+                        disabled=not tcustom_val
+                    )
+                ], className="subscription-custom-group"),
+                html.Div([
+                    html.Label([
+                        dcc.Checklist(
+                            id={"type": "sub-notify-drop", "index": tid},
+                            options=[{"label": "  进度下降提醒", "value": "drop"}],
+                            value=["drop"] if tdrop_val else [],
+                            className="sub-checkbox"
+                        )
+                    ], className="sub-checkbox-label")
+                ], className="subscription-drop-group"),
+                html.Div([
+                    html.Button(
+                        "💾 保存",
+                        id={"type": "save-sub-btn", "index": tid},
+                        className="save-sub-btn",
+                        n_clicks=0
+                    )
+                ], className="subscription-actions")
+            ], className="subscription-row", **{"data-target-name": tname})
+        )
+
+    return html.Div([
+        html.Div("🔔 提醒订阅管理", className="subscription-title"),
+        html.Div("为目标勾选需要接收的通知类型（完成度阈值、进度下降等）", className="subscription-subtitle"),
+        html.Div(config_rows, className="subscription-list"),
+        html.Div(id="subscription-status", className="subscription-status")
+    ], className="subscription-panel")
+
+
 initial_alert_config = load_alert_config()
 initial_targets = get_visible_targets()
 initial_triggered, initial_alert_logs = detect_and_log_alerts(
     initial_targets, initial_alert_config, prev_triggered_names=None, is_initial_load=True
 )
+
+initial_user_subscriptions = []
+initial_user_notifications = []
 
 initial_sync_config = load_sync_config()
 initial_sync_logs = load_sync_logs()
@@ -1863,6 +2053,7 @@ initial_sync_status = {
 app.layout = html.Div([
     dcc.Store(id="user-store", data=None),
     dcc.Store(id="targets-store", data=initial_targets),
+    dcc.Store(id="prev-targets-store", data=None),
     dcc.Store(id="history-store", data=load_history()),
     dcc.Store(id="alert-config-store", data=initial_alert_config),
     dcc.Store(id="alert-logs-store", data=initial_alert_logs),
@@ -1874,13 +2065,19 @@ app.layout = html.Div([
     dcc.Store(id="sync-logs-store", data=initial_sync_logs),
     dcc.Store(id="sync-trigger-store", data=0),
     dcc.Store(id="ranking-time-range-store", data="all"),
+    dcc.Store(id="user-subscriptions-store", data=initial_user_subscriptions),
+    dcc.Store(id="user-notifications-store", data=initial_user_notifications),
+    dcc.Store(id="notification-refresh-store", data=0),
     dcc.Download(id="download-data"),
     dcc.Interval(id="alert-interval", interval=30000, n_intervals=0),
     dcc.Interval(id="sync-interval", interval=initial_sync_config.get("interval_seconds", 60) * 1000, n_intervals=0, disabled=not initial_sync_config.get("enabled", True)),
     dcc.Interval(id="countdown-interval", interval=1000, n_intervals=0),
+    dcc.Interval(id="notification-interval", interval=15000, n_intervals=0),
 
     html.Div([
         html.Div(id="auth-section", className="auth-section-container"),
+        html.Div(id="notification-badge-container", className="notification-badge-wrapper"),
+        html.Div(id="notification-panel-container"),
         html.H1("🎯 目标完成进度监控", className="page-title"),
         html.Div(
             id="update-time-text",
@@ -2043,7 +2240,12 @@ app.layout = html.Div([
                 html.Div([
                     html.H2("⚙️ 预警阈值配置", className="section-title"),
                     html.Div(id="alert-config-container", children=create_alert_config_panel(initial_alert_config, initial_targets))
-                ], className="alert-config-section")
+                ], className="alert-config-section"),
+
+                html.Div([
+                    html.H2("🔔 提醒订阅管理", className="section-title"),
+                    html.Div(id="subscription-container", children=create_subscription_panel([], initial_targets, None))
+                ], className="subscription-section")
             ], className="main-content"),
 
             html.Div([
@@ -3040,6 +3242,292 @@ def handle_sync_config_and_logs(save_clicks, sync_logs, enabled_val, interval_va
         return config, status_msg, create_sync_logs_list(logs), status
 
     return no_update, no_update, create_sync_logs_list(logs), no_update
+
+
+@app.callback(
+    [Output("user-subscriptions-store", "data"),
+     Output("user-notifications-store", "data")],
+    [Input("user-store", "data"),
+     Input("notification-refresh-store", "data")],
+    prevent_initial_call=False
+)
+def load_user_subscriptions_and_notifications(user_data, refresh):
+    if not user_data:
+        return [], []
+    user_id = user_data["user_id"]
+    subscriptions = get_user_subscriptions(user_id)
+    notifications = get_user_notifications(user_id, limit=50)
+    return subscriptions, notifications
+
+
+@app.callback(
+    Output("notification-badge-container", "children"),
+    [Input("user-store", "data"),
+     Input("user-notifications-store", "data")],
+    prevent_initial_call=False
+)
+def render_notification_badge(user_data, notifications):
+    return create_notification_badge(user_data)
+
+
+@app.callback(
+    Output("notification-panel-container", "children"),
+    [Input("user-store", "data"),
+     Input("user-notifications-store", "data")],
+    prevent_initial_call=False
+)
+def render_notification_panel(user_data, notifications):
+    return create_notification_panel(notifications or [], user_data)
+
+
+@app.callback(
+    Output("subscription-container", "children"),
+    [Input("user-store", "data"),
+     Input("targets-store", "data"),
+     Input("user-subscriptions-store", "data")],
+    prevent_initial_call=False
+)
+def render_subscription_panel(user_data, targets_data, subscriptions):
+    return create_subscription_panel(subscriptions or [], targets_data, user_data)
+
+
+@app.callback(
+    Output("notification-panel", "className"),
+    [Input("toggle-notification-btn", "n_clicks")],
+    [State("notification-panel", "className")],
+    prevent_initial_call=True
+)
+def toggle_notification_panel(n_clicks, current_class):
+    if not n_clicks or n_clicks == 0:
+        return no_update
+    classes = current_class or ""
+    if "hidden" in classes:
+        return "notification-panel"
+    else:
+        return "notification-panel hidden"
+
+
+@app.callback(
+    [Output("user-notifications-store", "data", allow_duplicate=True),
+     Output("notification-refresh-store", "data", allow_duplicate=True)],
+    [Input("mark-all-read-btn", "n_clicks"),
+     Input({"type": "notification-item", "index": ALL}, "n_clicks")],
+    [State("user-store", "data"),
+     State("notification-refresh-store", "data")],
+    prevent_initial_call='initial_duplicate'
+)
+def handle_mark_read(mark_all_clicks, item_clicks_list, user_data, current_refresh):
+    ctx = callback_context
+    if not ctx.triggered or not user_data:
+        return no_update, no_update
+
+    trigger = ctx.triggered[0]
+    trigger_prop = trigger["prop_id"]
+    user_id = user_data["user_id"]
+    new_refresh = (current_refresh or 0) + 1
+
+    if trigger_prop == "mark-all-read-btn.n_clicks":
+        if mark_all_clicks and mark_all_clicks > 0:
+            mark_all_notifications_read(user_id)
+            notifications = get_user_notifications(user_id, limit=50)
+            return notifications, new_refresh
+    elif "notification-item" in trigger_prop:
+        try:
+            prop_dict = json.loads(trigger_prop.split(".")[0])
+            notif_id = prop_dict["index"]
+            mark_notification_read(user_id, notif_id)
+            notifications = get_user_notifications(user_id, limit=50)
+            return notifications, new_refresh
+        except Exception:
+            pass
+
+    return no_update, no_update
+
+
+@app.callback(
+    Output({"type": "sub-custom-value", "index": ALL}, "disabled"),
+    [Input({"type": "sub-threshold-custom", "index": ALL}, "value")],
+    prevent_initial_call=False
+)
+def update_custom_input_disabled(custom_values):
+    if not custom_values:
+        return no_update
+    disabled_states = []
+    for val in custom_values:
+        is_enabled = bool(val and "custom" in val)
+        disabled_states.append(not is_enabled)
+    return disabled_states
+
+
+@app.callback(
+    [Output("user-subscriptions-store", "data", allow_duplicate=True),
+     Output("subscription-status", "children")],
+    [Input({"type": "save-sub-btn", "index": ALL}, "n_clicks")],
+    [State("user-store", "data"),
+     State("targets-store", "data"),
+     State({"type": "sub-threshold-50", "index": ALL}, "value"),
+     State({"type": "sub-threshold-50", "index": ALL}, "id"),
+     State({"type": "sub-threshold-80", "index": ALL}, "value"),
+     State({"type": "sub-threshold-80", "index": ALL}, "id"),
+     State({"type": "sub-threshold-100", "index": ALL}, "value"),
+     State({"type": "sub-threshold-100", "index": ALL}, "id"),
+     State({"type": "sub-threshold-custom", "index": ALL}, "value"),
+     State({"type": "sub-threshold-custom", "index": ALL}, "id"),
+     State({"type": "sub-custom-value", "index": ALL}, "value"),
+     State({"type": "sub-custom-value", "index": ALL}, "id"),
+     State({"type": "sub-notify-drop", "index": ALL}, "value"),
+     State({"type": "sub-notify-drop", "index": ALL}, "id")],
+    prevent_initial_call='initial_duplicate'
+)
+def handle_save_subscription(save_clicks_list, user_data, targets_data,
+                              t50_values, t50_ids, t80_values, t80_ids,
+                              t100_values, t100_ids,
+                              tcustom_values, tcustom_ids, tcustom_val_values, tcustom_val_ids,
+                              tdrop_values, tdrop_ids):
+    ctx = callback_context
+    if not ctx.triggered or not user_data:
+        return no_update, ""
+
+    trigger = ctx.triggered[0]
+    trigger_prop = trigger["prop_id"]
+    trigger_value = trigger["value"]
+
+    if not trigger_value or trigger_value == 0:
+        return no_update, ""
+
+    try:
+        prop_dict = json.loads(trigger_prop.split(".")[0])
+        target_id = prop_dict["index"]
+    except Exception:
+        return no_update, ""
+
+    user_id = user_data["user_id"]
+    target_name = ""
+    if targets_data:
+        for t in targets_data:
+            if t.get("id") == target_id:
+                target_name = t["name"]
+                break
+
+    t50 = False
+    for i, tid in enumerate(t50_ids or []):
+        if tid.get("index") == target_id:
+            t50 = bool(t50_values[i] and "50" in t50_values[i])
+            break
+
+    t80 = False
+    for i, tid in enumerate(t80_ids or []):
+        if tid.get("index") == target_id:
+            t80 = bool(t80_values[i] and "80" in t80_values[i])
+            break
+
+    t100 = False
+    for i, tid in enumerate(t100_ids or []):
+        if tid.get("index") == target_id:
+            t100 = bool(t100_values[i] and "100" in t100_values[i])
+            break
+
+    tcustom_enabled = False
+    for i, tid in enumerate(tcustom_ids or []):
+        if tid.get("index") == target_id:
+            tcustom_enabled = bool(tcustom_values[i] and "custom" in tcustom_values[i])
+            break
+
+    tcustom_val = None
+    if tcustom_enabled:
+        for i, tid in enumerate(tcustom_val_ids or []):
+            if tid.get("index") == target_id:
+                if tcustom_val_values[i] is not None:
+                    tcustom_val = float(tcustom_val_values[i])
+                break
+
+    tdrop = False
+    for i, tid in enumerate(tdrop_ids or []):
+        if tid.get("index") == target_id:
+            tdrop = bool(tdrop_values[i] and "drop" in tdrop_values[i])
+            break
+
+    if not any([t50, t80, t100, (tcustom_enabled and tcustom_val is not None), tdrop]):
+        existing = get_subscription_by_user_target(user_id, target_id)
+        if existing:
+            delete_subscription(user_id, existing["id"])
+    else:
+        create_subscription(
+            user_id=user_id,
+            target_id=target_id,
+            target_name=target_name,
+            threshold_50=t50,
+            threshold_80=t80,
+            threshold_100=t100,
+            threshold_custom=tcustom_val,
+            notify_on_drop=tdrop
+        )
+
+    updated_subscriptions = get_user_subscriptions(user_id)
+    status = html.Div([
+        html.Span("✅", className="status-icon"),
+        " 订阅设置已保存！"
+    ], className="config-save-success")
+
+    return updated_subscriptions, status
+
+
+@app.callback(
+    [Output("prev-targets-store", "data"),
+     Output("notification-refresh-store", "data", allow_duplicate=True)],
+    [Input("targets-store", "data"),
+     Input("alert-interval", "n_intervals"),
+     Input("notification-interval", "n_intervals")],
+    [State("prev-targets-store", "data"),
+     State("notification-refresh-store", "data"),
+     State("user-store", "data")],
+    prevent_initial_call='initial_duplicate'
+)
+def handle_notification_check(current_targets, alert_n, notif_n, prev_targets, current_refresh, user_data):
+    ctx = callback_context
+
+    def parse_targets_data(data):
+        if data is None:
+            return []
+        if isinstance(data, str):
+            try:
+                parsed = json.loads(data)
+                return parsed if isinstance(parsed, list) else []
+            except (json.JSONDecodeError, ValueError):
+                return []
+        if isinstance(data, list):
+            return data
+        return []
+
+    targets = parse_targets_data(current_targets)
+    if not targets:
+        targets = get_visible_targets()
+
+    def build_prev_map(targets_list):
+        prev_map = {}
+        for t in targets_list:
+            if isinstance(t, dict) and t.get("id"):
+                prev_map[t["id"]] = t
+        return prev_map
+
+    if not ctx.triggered:
+        return prev_targets, current_refresh or 0
+
+    prev_list = parse_targets_data(prev_targets)
+    prev_map = build_prev_map(prev_list)
+
+    triggered = check_and_trigger_notifications(targets, prev_map)
+
+    current_map = {}
+    for t in targets:
+        if isinstance(t, dict) and t.get("id"):
+            current_map[t["id"]] = t
+
+    new_refresh = current_refresh or 0
+    if triggered:
+        new_refresh += 1
+
+    return current_map, new_refresh
 
 
 if __name__ == "__main__":
