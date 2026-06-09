@@ -1,7 +1,7 @@
 import dash
 from dash import html, dcc, Input, Output, State, callback_context, no_update, ALL
 import plotly.graph_objects as go
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
 import io
@@ -42,7 +42,8 @@ from database import (
     get_target_by_id,
     save_prediction,
     get_latest_prediction_by_target,
-    get_latest_prediction_by_target_name
+    get_latest_prediction_by_target_name,
+    get_ranking_targets
 )
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
@@ -439,6 +440,185 @@ def create_prediction_info_panel(predictions):
         )
 
     return html.Div(items, className="prediction-info-list")
+
+
+def calculate_target_progress(target_name, history, time_range="all"):
+    from datetime import datetime as dt
+    timestamps = []
+    completions = []
+
+    start_time = None
+    if time_range == "week":
+        now = dt.now()
+        start_time = now - timedelta(days=now.weekday())
+        start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif time_range == "month":
+        now = dt.now()
+        start_time = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    for snapshot in history:
+        try:
+            snap_dt = dt.strptime(snapshot["timestamp"], "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            continue
+        if start_time and snap_dt < start_time:
+            continue
+        for target in snapshot["targets"]:
+            if target["name"] == target_name:
+                timestamps.append(snapshot["timestamp"])
+                completions.append(target["completion"])
+                break
+
+    if len(completions) >= 2:
+        initial = completions[0]
+        current = completions[-1]
+        return round(current - initial, 2), initial, current
+    elif len(completions) == 1:
+        return 0.0, completions[0], completions[0]
+    return 0.0, None, None
+
+
+def get_completion_top5(targets_data, history, time_range="all"):
+    ranked = sorted(targets_data, key=lambda x: x["completion"], reverse=True)
+    top5 = ranked[:5]
+    result = []
+    for idx, item in enumerate(top5):
+        progress, initial, current = calculate_target_progress(item["name"], history, time_range)
+        result.append({
+            **item,
+            "rank": idx + 1,
+            "progress": progress,
+            "initial_completion": initial if initial is not None else item["completion"]
+        })
+    return result
+
+
+def get_progress_top5(targets_data, history, time_range="all"):
+    targets_with_progress = []
+    for item in targets_data:
+        progress, initial, current = calculate_target_progress(item["name"], history, time_range)
+        targets_with_progress.append({
+            **item,
+            "progress": progress,
+            "initial_completion": initial if initial is not None else item["completion"],
+            "current_completion": current if current is not None else item["completion"]
+        })
+    ranked = sorted(targets_with_progress, key=lambda x: x["progress"], reverse=True)
+    top5 = ranked[:5]
+    for idx, item in enumerate(top5):
+        item["rank"] = idx + 1
+    return top5
+
+
+def _get_rank_badge(rank):
+    colors = {
+        1: ("#FFD700", "#FFF8DC"),
+        2: ("#C0C0C0", "#F5F5F5"),
+        3: ("#CD7F32", "#FFF5EE"),
+    }
+    if rank in colors:
+        color, bg = colors[rank]
+        return html.Span(
+            str(rank),
+            className="ranking-badge",
+            style={"background": bg, "color": color, "border": f"2px solid {color}"}
+        )
+    return html.Span(str(rank), className="ranking-badge ranking-badge-normal")
+
+
+def create_ranking_item(item, show_progress=False):
+    progress_display = ""
+    progress_class = ""
+    if show_progress and "progress" in item:
+        p = item["progress"]
+        if p > 0:
+            progress_display = f"+{p}%"
+            progress_class = "ranking-progress-up"
+        elif p < 0:
+            progress_display = f"{p}%"
+            progress_class = "ranking-progress-down"
+        else:
+            progress_display = "0%"
+            progress_class = "ranking-progress-flat"
+
+    completion = item.get("completion", 0)
+    if completion >= 90:
+        bar_color = "linear-gradient(90deg, #00C853, #64DD17)"
+    elif completion >= 70:
+        bar_color = "linear-gradient(90deg, #64DD17, #FFB300)"
+    elif completion >= 50:
+        bar_color = "linear-gradient(90deg, #FFB300, #FF9100)"
+    else:
+        bar_color = "linear-gradient(90deg, #FF5252, #FF1744)"
+
+    display_name = item["name"]
+    if item.get("username"):
+        display_name = f"{item['name']} ({item['username']})"
+
+    return html.Div([
+        _get_rank_badge(item["rank"]),
+        html.Div([
+            html.Div([
+                html.Span(display_name, className="ranking-target-name"),
+                html.Span(progress_display, className=f"ranking-progress {progress_class}") if show_progress else None
+            ], className="ranking-item-header"),
+            html.Div([
+                html.Div([
+                    html.Div(
+                        className="ranking-progress-bar",
+                        style={"width": f"{min(completion, 100)}%", "background": bar_color}
+                    )
+                ], className="ranking-progress-container"),
+                html.Span(f"{completion}%", className="ranking-completion-text")
+            ], className="ranking-item-body")
+        ], className="ranking-item-content")
+    ], className="ranking-item")
+
+
+def create_ranking_section(completion_top5, progress_top5, time_range="all"):
+    time_labels = {
+        "week": "本周",
+        "month": "本月",
+        "all": "全部时间"
+    }
+    current_label = time_labels.get(time_range, "全部时间")
+
+    completion_items = [create_ranking_item(item, show_progress=False) for item in completion_top5] if completion_top5 else [
+        html.Div("暂无数据", className="ranking-empty")
+    ]
+    progress_items = [create_ranking_item(item, show_progress=True) for item in progress_top5] if progress_top5 else [
+        html.Div("暂无数据", className="ranking-empty")
+    ]
+
+    return html.Div([
+        html.Div([
+            html.H2("🏆 目标排行榜", className="section-title ranking-section-title"),
+            html.Div([
+                html.Span("时间范围：", className="ranking-time-label"),
+                dcc.Dropdown(
+                    id="ranking-time-range",
+                    options=[
+                        {"label": "本周", "value": "week"},
+                        {"label": "本月", "value": "month"},
+                        {"label": "全部时间", "value": "all"}
+                    ],
+                    value=time_range,
+                    clearable=False,
+                    className="ranking-time-dropdown"
+                )
+            ], className="ranking-time-selector")
+        ], className="ranking-header"),
+        html.Div([
+            html.Div([
+                html.H3("🥇 完成率 TOP5", className="ranking-subtitle ranking-completion-title"),
+                html.Div(completion_items, className="ranking-list")
+            ], className="ranking-column ranking-completion-column"),
+            html.Div([
+                html.H3("🚀 进步最快 TOP5", className="ranking-subtitle ranking-progress-title"),
+                html.Div(progress_items, className="ranking-list")
+            ], className="ranking-column ranking-progress-column")
+        ], className="ranking-columns")
+    ], className="ranking-section")
 
 
 def create_trend_chart(selected_targets, history, targets_data=None):
@@ -1328,6 +1508,7 @@ app.layout = html.Div([
     dcc.Store(id="sync-status-store", data=initial_sync_status),
     dcc.Store(id="sync-logs-store", data=initial_sync_logs),
     dcc.Store(id="sync-trigger-store", data=0),
+    dcc.Store(id="ranking-time-range-store", data="all"),
     dcc.Download(id="download-data"),
     dcc.Interval(id="alert-interval", interval=30000, n_intervals=0),
     dcc.Interval(id="sync-interval", interval=initial_sync_config.get("interval_seconds", 60) * 1000, n_intervals=0, disabled=not initial_sync_config.get("enabled", True)),
@@ -1444,6 +1625,11 @@ app.layout = html.Div([
                         )
                     ], className="prediction-section")
                 ], className="trend-section"),
+
+                html.Div(
+                    id="ranking-container",
+                    className="ranking-section-wrapper"
+                ),
 
                 html.Div([
                     html.H2("⚙️ 预警阈值配置", className="section-title"),
@@ -1952,6 +2138,39 @@ def handle_trend_updates(n_clicks, selected_targets, current_targets, current_hi
     predictions = [predict_target_completion(t, history, targets) for t in sel]
 
     return history, status, fig, count_text, options, create_prediction_info_panel(predictions)
+
+
+@app.callback(
+    Output("ranking-time-range-store", "data"),
+    [Input("ranking-time-range", "value")],
+    [State("ranking-time-range-store", "data")],
+    prevent_initial_call=False
+)
+def handle_ranking_time_range(new_value, current_value):
+    if new_value is None:
+        return current_value or "all"
+    return new_value
+
+
+@app.callback(
+    Output("ranking-container", "children"),
+    [Input("ranking-time-range-store", "data"),
+     Input("targets-store", "data"),
+     Input("history-store", "data"),
+     Input("user-store", "data")],
+    prevent_initial_call=False
+)
+def render_ranking_section(time_range, targets_data, history_data, user_data):
+    time_range = time_range or "all"
+    user_id = user_data["user_id"] if user_data else None
+    history = history_data or load_history()
+    targets = targets_data or get_ranking_targets(time_range, user_id)
+
+    ranking_targets = get_ranking_targets(time_range, user_id)
+    completion_top5 = get_completion_top5(ranking_targets, history, time_range)
+    progress_top5 = get_progress_top5(ranking_targets, history, time_range)
+
+    return create_ranking_section(completion_top5, progress_top5, time_range)
 
 
 @app.callback(

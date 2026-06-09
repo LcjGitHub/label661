@@ -1,7 +1,7 @@
 import sqlite3
 import os
 import hashlib
-from datetime import datetime
+from datetime import datetime, timedelta
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "monitor.db")
@@ -390,6 +390,65 @@ def get_all_predictions_by_target(target_id):
     rows = cursor.fetchall()
     conn.close()
     return [row_to_prediction_dict(r) for r in rows]
+
+
+def _get_time_range_start(time_range):
+    now = datetime.now()
+    if time_range == "week":
+        start = now - timedelta(days=now.weekday())
+        return start.replace(hour=0, minute=0, second=0, microsecond=0).strftime("%Y-%m-%d %H:%M:%S")
+    elif time_range == "month":
+        start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        return start.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        return None
+
+
+def _row_to_ranking_dict(row):
+    return {
+        "id": row["id"],
+        "name": row["name"],
+        "target": row["target"],
+        "current": row["current"],
+        "unit": row["unit"],
+        "completion": row["completion"],
+        "user_id": row["user_id"],
+        "is_public": row["is_public"],
+        "created_at": row["created_at"],
+        "updated_at": row["updated_at"],
+        "username": row["username"] if "username" in row.keys() else None
+    }
+
+
+def get_ranking_targets(time_range="all", user_id=None):
+    start_time = _get_time_range_start(time_range)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    base_query = """
+        SELECT t.*, u.username
+        FROM targets t
+        LEFT JOIN users u ON t.user_id = u.id
+        WHERE 1=1
+    """
+    params = []
+
+    if start_time:
+        base_query += " AND t.updated_at >= ?"
+        params.append(start_time)
+
+    if user_id is not None:
+        base_query += " AND (t.user_id = ? OR t.is_public = 1)"
+        params.append(user_id)
+    else:
+        base_query += " AND t.is_public = 1"
+
+    base_query += " ORDER BY t.completion DESC"
+
+    cursor.execute(base_query, params)
+    rows = cursor.fetchall()
+    conn.close()
+    return [_row_to_ranking_dict(r) for r in rows]
 
 
 init_db()

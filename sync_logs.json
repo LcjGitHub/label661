@@ -1,5 +1,1544 @@
 [
   {
+    "timestamp": "2026-06-09 17:10:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.95,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:10:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.93,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:09:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.39,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:09:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.46,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:09:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.39,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:08:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.67,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:08:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.51,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:08:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.99,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:07:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.58,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:07:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.71,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:07:02",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.2,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:06:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.91,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:06:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.1,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:06:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.66,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:05:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.88,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:05:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.89,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:05:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.88,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:04:59",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.04,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:04:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.93,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:04:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.63,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:03:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.43,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:03:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.08,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:03:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.74,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:02:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.93,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:02:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.8,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:02:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.55,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:01:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.44,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:01:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.45,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:01:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.68,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:00:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.66,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:00:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.98,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 17:00:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.77,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:59:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.89,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:59:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.84,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:59:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.67,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:58:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.74,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:58:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.79,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:58:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.9,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:57:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.38,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:57:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.46,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:57:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.38,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:56:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.44,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:56:40",
+    "success": false,
+    "message": "模拟网络连接失败：无法连接到外部 API 服务器",
+    "details": {
+      "elapsed_seconds": 1.06,
+      "traceback": "Traceback (most recent call last):\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 181, in perform_sync\n    data = fetch_external_api_data(config)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 108, in fetch_external_api_data\n    return fetch_mock_api_data()\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 82, in fetch_mock_api_data\n    raise ConnectionError(\"模拟网络连接失败：无法连接到外部 API 服务器\")\nConnectionError: 模拟网络连接失败：无法连接到外部 API 服务器\n"
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:56:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.88,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:56:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.4,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:55:59",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.13,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:55:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.12,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:55:21",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.38,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:55:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.99,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:54:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.71,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:54:38",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.06,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:54:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.35,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:53:59",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.19,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:53:34",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.71,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:53:02",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.97,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:52:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.49,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:52:34",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.49,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:52:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.71,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:51:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.49,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:51:34",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.54,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:51:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.73,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:50:59",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.01,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:50:34",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.61,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:50:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.53,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:49:59",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.12,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:49:35",
+    "success": false,
+    "message": "模拟网络连接失败：无法连接到外部 API 服务器",
+    "details": {
+      "elapsed_seconds": 0.94,
+      "traceback": "Traceback (most recent call last):\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 181, in perform_sync\n    data = fetch_external_api_data(config)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 108, in fetch_external_api_data\n    return fetch_mock_api_data()\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 82, in fetch_mock_api_data\n    raise ConnectionError(\"模拟网络连接失败：无法连接到外部 API 服务器\")\nConnectionError: 模拟网络连接失败：无法连接到外部 API 服务器\n"
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:49:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.58,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:48:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.39,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:48:34",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.86,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:48:02",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.99,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:47:59",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.1,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:47:41",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.83,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:47:34",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.5,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:47:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.94,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:46:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.44,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:46:45",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.84,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:46:35",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.16,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:46:02",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.19,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:45:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.57,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:45:34",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.31,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:45:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.99,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:44:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.37,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:44:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.98,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:44:34",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.62,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:44:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.97,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:43:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.5,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:43:42",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.62,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:43:08",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.77,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:43:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.51,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:42:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.48,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:42:08",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.61,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:42:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.88,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:41:59",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.74,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:41:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.97,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:41:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.38,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:40:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.31,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:40:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.51,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:39:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.63,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:39:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.77,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:39:12",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.91,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:39:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.38,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:38:59",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.03,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:38:41",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.7,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:38:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.46,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:38:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.84,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:37:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.49,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:37:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.76,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:37:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.71,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:36:59",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.2,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:36:41",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.05,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:36:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.52,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:36:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.34,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:35:59",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.09,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:35:41",
+    "success": false,
+    "message": "模拟网络连接失败：无法连接到外部 API 服务器",
+    "details": {
+      "elapsed_seconds": 0.56,
+      "traceback": "Traceback (most recent call last):\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 181, in perform_sync\n    data = fetch_external_api_data(config)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 108, in fetch_external_api_data\n    return fetch_mock_api_data()\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 82, in fetch_mock_api_data\n    raise ConnectionError(\"模拟网络连接失败：无法连接到外部 API 服务器\")\nConnectionError: 模拟网络连接失败：无法连接到外部 API 服务器\n"
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:35:12",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.97,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:35:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.53,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:34:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.57,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:34:12",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.17,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:34:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.45,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:33:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.79,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:33:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.33,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:33:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.72,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:33:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.57,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:32:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.46,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:32:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.11,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:32:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.63,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:32:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.76,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:31:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.75,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:31:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.9,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:31:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.43,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:31:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.69,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:30:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.46,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:30:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.58,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:30:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.83,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:30:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.39,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:30:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.7,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:29:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.67,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:29:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.91,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:29:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.45,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:29:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.52,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:29:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.08,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:28:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.37,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:28:41",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.89,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:28:41",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.33,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:28:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.9,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:28:01",
+    "success": false,
+    "message": "模拟网络连接失败：无法连接到外部 API 服务器",
+    "details": {
+      "elapsed_seconds": 0.38,
+      "traceback": "Traceback (most recent call last):\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 181, in perform_sync\n    data = fetch_external_api_data(config)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 108, in fetch_external_api_data\n    return fetch_mock_api_data()\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 82, in fetch_mock_api_data\n    raise ConnectionError(\"模拟网络连接失败：无法连接到外部 API 服务器\")\nConnectionError: 模拟网络连接失败：无法连接到外部 API 服务器\n"
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:27:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.58,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:27:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.09,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:27:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.44,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:27:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.62,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:27:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.93,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:26:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.39,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:26:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.36,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:26:02",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.19,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:25:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.68,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:25:42",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.18,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:25:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.45,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:25:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.36,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:25:01",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.73,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:24:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.72,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:24:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.47,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:24:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.5,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:23:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.48,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:23:41",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 1.0,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:23:41",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.99,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:23:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.46,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:22:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.39,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:22:41",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.48,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:22:40",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.53,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:22:11",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.9,
+      "record_count": 6
+    }
+  },
+  {
+    "timestamp": "2026-06-09 16:21:58",
+    "success": true,
+    "message": "同步成功，获取到 6 条数据",
+    "details": {
+      "elapsed_seconds": 0.86,
+      "record_count": 6
+    }
+  },
+  {
     "timestamp": "2026-06-09 16:21:11",
     "success": true,
     "message": "同步成功，获取到 6 条数据",
@@ -257,1545 +1796,6 @@
     "message": "同步成功，获取到 6 条数据",
     "details": {
       "elapsed_seconds": 0.93,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:12:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.36,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:12:29",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.69,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:12:27",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.14,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:11:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.46,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:11:31",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.03,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:11:06",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.42,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:10:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.57,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:10:30",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.09,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:10:06",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.59,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:09:59",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.8,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:09:30",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.87,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:08:59",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.15,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:08:29",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.99,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:07:59",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.58,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:06:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.74,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:06:47",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.04,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:05:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.77,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:05:47",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.45,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:04:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.32,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:03:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.74,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:02:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.74,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:02:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.33,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:01:59",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.17,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:01:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.32,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:01:40",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.97,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:00:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.81,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 16:00:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.7,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:59:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.87,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:59:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.38,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:58:59",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.11,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:58:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.69,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:58:41",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.58,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:57:59",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.09,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:57:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.76,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:57:05",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.6,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:56:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.64,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:56:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.96,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:56:39",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.33,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:55:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.85,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:55:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.64,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:55:25",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.86,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:54:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.77,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:54:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.47,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:54:41",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.59,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:53:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.63,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:53:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.42,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:53:40",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.94,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:52:59",
-    "success": false,
-    "message": "模拟网络连接失败：无法连接到外部 API 服务器",
-    "details": {
-      "elapsed_seconds": 1.14,
-      "traceback": "Traceback (most recent call last):\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 181, in perform_sync\n    data = fetch_external_api_data(config)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 108, in fetch_external_api_data\n    return fetch_mock_api_data()\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 82, in fetch_mock_api_data\n    raise ConnectionError(\"模拟网络连接失败：无法连接到外部 API 服务器\")\nConnectionError: 模拟网络连接失败：无法连接到外部 API 服务器\n"
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:52:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.93,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:52:45",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.73,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:51:59",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.17,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:51:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.87,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:51:42",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.67,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:50:57",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.14,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:49:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.87,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:49:42",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.34,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:49:39",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.64,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:48:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.0,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:48:39",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.66,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:47:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.73,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:46:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.84,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:46:41",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.16,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:45:57",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.96,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:45:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.75,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:45:40",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.95,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:45:40",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.16,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:44:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.95,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:44:40",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.87,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:43:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.03,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:43:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.81,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:43:40",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.07,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:42:56",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.95,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:42:55",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.52,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:42:45",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.57,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:41:55",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.0,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:41:42",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.18,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:41:40",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.57,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:41:03",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.35,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:40:42",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.12,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:40:28",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.97,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:39:51",
-    "success": false,
-    "message": "模拟网络连接失败：无法连接到外部 API 服务器",
-    "details": {
-      "elapsed_seconds": 0.91,
-      "traceback": "Traceback (most recent call last):\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 181, in perform_sync\n    data = fetch_external_api_data(config)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 108, in fetch_external_api_data\n    return fetch_mock_api_data()\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 82, in fetch_mock_api_data\n    raise ConnectionError(\"模拟网络连接失败：无法连接到外部 API 服务器\")\nConnectionError: 模拟网络连接失败：无法连接到外部 API 服务器\n"
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:39:42",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.63,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:39:42",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.78,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:38:42",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.11,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:37:42",
-    "success": false,
-    "message": "模拟网络连接失败：无法连接到外部 API 服务器",
-    "details": {
-      "elapsed_seconds": 0.46,
-      "traceback": "Traceback (most recent call last):\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 181, in perform_sync\n    data = fetch_external_api_data(config)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 108, in fetch_external_api_data\n    return fetch_mock_api_data()\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 82, in fetch_mock_api_data\n    raise ConnectionError(\"模拟网络连接失败：无法连接到外部 API 服务器\")\nConnectionError: 模拟网络连接失败：无法连接到外部 API 服务器\n"
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:36:42",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.78,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:36:04",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.72,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:35:42",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.73,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:35:33",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.92,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:35:12",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.09,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:34:41",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.84,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:34:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.74,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:34:04",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.76,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:33:19",
-    "success": false,
-    "message": "模拟网络连接失败：无法连接到外部 API 服务器",
-    "details": {
-      "elapsed_seconds": 0.57,
-      "traceback": "Traceback (most recent call last):\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 181, in perform_sync\n    data = fetch_external_api_data(config)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 108, in fetch_external_api_data\n    return fetch_mock_api_data()\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 82, in fetch_mock_api_data\n    raise ConnectionError(\"模拟网络连接失败：无法连接到外部 API 服务器\")\nConnectionError: 模拟网络连接失败：无法连接到外部 API 服务器\n"
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:33:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.06,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:32:57",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.33,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:32:52",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.96,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:32:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.52,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:31:59",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.76,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:31:28",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.54,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:31:10",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.43,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:30:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.81,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:30:38",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.13,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:30:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.0,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:29:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.61,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:29:42",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.94,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:29:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.38,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:28:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.83,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:28:51",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.84,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:28:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.67,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:27:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.0,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:27:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.74,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:26:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.41,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:26:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.1,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:25:28",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.41,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:25:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.72,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:24:10",
-    "success": false,
-    "message": "模拟网络连接失败：无法连接到外部 API 服务器",
-    "details": {
-      "elapsed_seconds": 0.34,
-      "traceback": "Traceback (most recent call last):\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 181, in perform_sync\n    data = fetch_external_api_data(config)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 108, in fetch_external_api_data\n    return fetch_mock_api_data()\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"F:\\Lcj\\0606\\label661\\sync_module.py\", line 82, in fetch_mock_api_data\n    raise ConnectionError(\"模拟网络连接失败：无法连接到外部 API 服务器\")\nConnectionError: 模拟网络连接失败：无法连接到外部 API 服务器\n"
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:23:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.67,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:22:10",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.39,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:21:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.71,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:20:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.4,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:19:10",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.44,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:18:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.98,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:17:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.87,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:16:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.54,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:15:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.0,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:14:10",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.37,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:13:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.84,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:12:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.94,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:11:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.67,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:10:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.71,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:09:41",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.77,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:09:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.68,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:08:40",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.56,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:08:10",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.32,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:07:40",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.13,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:07:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.14,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:06:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.58,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:05:53",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.85,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:05:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.64,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:05:06",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.47,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:04:10",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.37,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:03:52",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.69,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:03:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.99,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:02:53",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.13,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:02:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.61,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:01:54",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.35,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:01:46",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.15,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:01:10",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.48,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:00:48",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.2,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:00:41",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.62,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 15:00:10",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.44,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:59:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.48,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:59:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.61,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:58:58",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.84,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:58:48",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.04,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:58:17",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.38,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:58:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.51,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:57:16",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.13,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:57:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.77,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:57:02",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.1,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:56:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.14,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:56:02",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.37,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:55:48",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.05,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:55:10",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.4,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:55:02",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.0,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:54:51",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 1.06,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:54:11",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.97,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:54:02",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.97,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:53:51",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.41,
-      "record_count": 6
-    }
-  },
-  {
-    "timestamp": "2026-06-09 14:53:19",
-    "success": true,
-    "message": "同步成功，获取到 6 条数据",
-    "details": {
-      "elapsed_seconds": 0.58,
       "record_count": 6
     }
   }
