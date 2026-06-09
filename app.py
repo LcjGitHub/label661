@@ -824,6 +824,12 @@ app.layout = html.Div([
         html.Div([
             html.Div([
                 html.Button(
+                    [html.Span("📂", className="btn-icon"), " 导入数据"],
+                    id="import-btn",
+                    className="io-btn io-btn-import",
+                    n_clicks=0
+                ),
+                html.Button(
                     [html.Span("📥", className="btn-icon"), " 导出 Excel"],
                     id="export-excel-btn",
                     className="io-btn io-btn-excel",
@@ -845,42 +851,6 @@ app.layout = html.Div([
         ),
         html.Div(id="save-status", className="save-status"),
         html.Div(id="io-status", className="io-status"),
-        html.Div(id="import-modal-container", className="import-modal-overlay hidden", children=[
-            html.Div(className="import-modal", children=[
-                html.Div(className="import-modal-header", children=[
-                    html.Span("📂 选择数据文件导入", className="import-modal-title"),
-                    html.Button("×", id="import-modal-close", className="import-modal-close-btn")
-                ]),
-                html.Div(className="import-modal-body", children=[
-                    html.Div("支持 Excel (.xlsx, .xls) 和 CSV (.csv) 格式文件", className="import-modal-hint"),
-                    dcc.Upload(
-                        id="upload-data",
-                        children=html.Div(className="upload-zone", children=[
-                            html.Div("📁", className="upload-zone-icon"),
-                            html.Div([
-                                html.Div("点击选择文件或拖拽文件到此处", className="upload-zone-text-main"),
-                                html.Div("文件名应包含：目标名称、当前值、目标值、完成率、单位", className="upload-zone-text-sub")
-                            ], className="upload-zone-texts")
-                        ]),
-                        multiple=False,
-                        accept=".csv,.xlsx,.xls",
-                        className="upload-component"
-                    )
-                ])
-            ])
-        ]),
-        html.Div(id="error-modal-container", className="error-modal-overlay hidden", children=[
-            html.Div(className="error-modal", children=[
-                html.Div(className="error-modal-header", children=[
-                    html.Span("⚠️ 数据导入错误", className="error-modal-title"),
-                    html.Button("×", id="error-modal-close", className="error-modal-close-btn")
-                ]),
-                html.Div(id="error-modal-body", className="error-modal-body", children="")
-            ])
-        ]),
-        create_login_modal(),
-        create_register_modal(),
-        create_edit_target_modal(),
     ], className="header"),
 
     html.Div(id="alert-banner-container", children=create_alert_banner(initial_triggered)),
@@ -937,7 +907,44 @@ app.layout = html.Div([
 
     html.Footer([
         html.Div("目标完成进度监控系统 © 2026", className="footer-text")
-    ], className="footer")
+    ], className="footer"),
+
+    html.Div(id="import-modal-container", className="import-modal-overlay hidden", children=[
+        html.Div(className="import-modal", children=[
+            html.Div(className="import-modal-header", children=[
+                html.Span("📂 选择数据文件导入", className="import-modal-title"),
+                html.Button("×", id="import-modal-close", className="import-modal-close-btn")
+            ]),
+            html.Div(className="import-modal-body", children=[
+                html.Div("支持 Excel (.xlsx, .xls) 和 CSV (.csv) 格式文件", className="import-modal-hint"),
+                dcc.Upload(
+                    id="upload-data",
+                    children=html.Div(className="upload-zone", children=[
+                        html.Div("📁", className="upload-zone-icon"),
+                        html.Div([
+                            html.Div("点击选择文件或拖拽文件到此处", className="upload-zone-text-main"),
+                            html.Div("文件名应包含：目标名称、当前值、目标值、完成率、单位", className="upload-zone-text-sub")
+                        ], className="upload-zone-texts")
+                    ]),
+                    multiple=False,
+                    accept=".csv,.xlsx,.xls",
+                    className="upload-component"
+                )
+            ])
+        ])
+    ]),
+    html.Div(id="error-modal-container", className="error-modal-overlay hidden", children=[
+        html.Div(className="error-modal", children=[
+            html.Div(className="error-modal-header", children=[
+                html.Span("⚠️ 数据导入错误", className="error-modal-title"),
+                html.Button("×", id="error-modal-close", className="error-modal-close-btn")
+            ]),
+            html.Div(id="error-modal-body", className="error-modal-body", children="")
+        ])
+    ]),
+    create_login_modal(),
+    create_register_modal(),
+    create_edit_target_modal(),
 
 ], className="main-container")
 
@@ -959,27 +966,31 @@ def render_create_target_section(user_data):
 
 
 @app.callback(
-    [Output("login-modal-container", "className"),
-     Output("register-modal-container", "className")],
+    [Output("login-modal-container", "className", allow_duplicate=True),
+     Output("register-modal-container", "className", allow_duplicate=True)],
     [Input("show-login-btn", "n_clicks"),
      Input("show-register-btn", "n_clicks"),
      Input("login-modal-close", "n_clicks"),
-     Input("register-modal-close", "n_clicks"),
-     Input("do-login-btn", "n_clicks"),
-     Input("do-register-btn", "n_clicks")],
+     Input("register-modal-close", "n_clicks")],
     prevent_initial_call=True
 )
-def toggle_auth_modals(n_login_show, n_reg_show, n_login_close, n_reg_close, n_login_do, n_reg_do):
+def toggle_auth_modals(n_login_show, n_reg_show, n_login_close, n_reg_close):
     ctx = callback_context
     if not ctx.triggered:
         return ["auth-modal-overlay hidden", "auth-modal-overlay hidden"]
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-    login_cls = "auth-modal-overlay hidden"
-    register_cls = "auth-modal-overlay hidden"
+    login_cls = no_update
+    register_cls = no_update
     if trigger_id == "show-login-btn":
         login_cls = "auth-modal-overlay"
+        register_cls = "auth-modal-overlay hidden"
     elif trigger_id == "show-register-btn":
+        login_cls = "auth-modal-overlay hidden"
         register_cls = "auth-modal-overlay"
+    elif trigger_id == "login-modal-close":
+        login_cls = "auth-modal-overlay hidden"
+    elif trigger_id == "register-modal-close":
+        register_cls = "auth-modal-overlay hidden"
     return [login_cls, register_cls]
 
 
@@ -987,38 +998,40 @@ def toggle_auth_modals(n_login_show, n_reg_show, n_login_close, n_reg_close, n_l
     [Output("user-store", "data"),
      Output("login-error-msg", "children"),
      Output("login-username", "value"),
-     Output("login-password", "value")],
+     Output("login-password", "value"),
+     Output("login-modal-container", "className", allow_duplicate=True)],
     [Input("do-login-btn", "n_clicks"),
      Input("logout-btn", "n_clicks")],
     [State("login-username", "value"),
      State("login-password", "value"),
-     State("user-store", "data")],
+     State("user-store", "data"),
+     State("login-modal-container", "className")],
     prevent_initial_call=False
 )
-def handle_login_logout(n_login, n_logout, username, password, current_user):
+def handle_login_logout(n_login, n_logout, username, password, current_user, current_login_cls):
     ctx = callback_context
     if not ctx.triggered:
-        return no_update, "", "", ""
+        return no_update, "", "", "", no_update
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
     if trigger_id == "logout-btn":
-        return None, "", "", ""
+        return None, "", "", "", no_update
 
     if trigger_id == "do-login-btn":
         if not n_login or n_login == 0:
-            return no_update, "", username, password
+            return no_update, "", username, password, no_update
         if not username or not username.strip():
-            return no_update, html.Span("⚠️ 请输入用户名", className="auth-error-text"), username, password
+            return no_update, html.Span("⚠️ 请输入用户名", className="auth-error-text"), username, password, current_login_cls
         if not password:
-            return no_update, html.Span("⚠️ 请输入密码", className="auth-error-text"), username, password
+            return no_update, html.Span("⚠️ 请输入密码", className="auth-error-text"), username, password, current_login_cls
         result = login_user(username.strip(), password)
         if result["success"]:
             user_data = {"user_id": result["user_id"], "username": result["username"]}
-            return user_data, "", "", ""
+            return user_data, "", "", "", "auth-modal-overlay hidden"
         else:
-            return no_update, html.Span(f"⚠️ {result['error']}", className="auth-error-text"), username, password
+            return no_update, html.Span(f"⚠️ {result['error']}", className="auth-error-text"), username, password, current_login_cls
 
-    return no_update, "", username, password
+    return no_update, "", username, password, no_update
 
 
 @app.callback(
@@ -1026,28 +1039,29 @@ def handle_login_logout(n_login, n_logout, username, password, current_user):
      Output("register-username", "value"),
      Output("register-password", "value"),
      Output("register-password2", "value"),
-     Output("show-login-btn", "n_clicks")],
+     Output("login-modal-container", "className", allow_duplicate=True),
+     Output("register-modal-container", "className", allow_duplicate=True)],
     [Input("do-register-btn", "n_clicks")],
     [State("register-username", "value"),
      State("register-password", "value"),
      State("register-password2", "value"),
-     State("show-login-btn", "n_clicks")],
+     State("register-modal-container", "className")],
     prevent_initial_call=True
 )
-def handle_register(n_clicks, username, password, password2, n_login_show):
+def handle_register(n_clicks, username, password, password2, current_register_cls):
     if not n_clicks or n_clicks == 0:
-        return no_update, username, password, password2, no_update
+        return no_update, username, password, password2, no_update, no_update
     if not username or len(username.strip()) < 3 or len(username.strip()) > 20:
-        return html.Span("⚠️ 用户名长度应为3-20个字符", className="auth-error-text"), username, password, password2, no_update
+        return html.Span("⚠️ 用户名长度应为3-20个字符", className="auth-error-text"), username, password, password2, no_update, current_register_cls
     if not password or len(password) < 6:
-        return html.Span("⚠️ 密码至少6位", className="auth-error-text"), username, password, password2, no_update
+        return html.Span("⚠️ 密码至少6位", className="auth-error-text"), username, password, password2, no_update, current_register_cls
     if password != password2:
-        return html.Span("⚠️ 两次输入的密码不一致", className="auth-error-text"), username, password, password2, no_update
+        return html.Span("⚠️ 两次输入的密码不一致", className="auth-error-text"), username, password, password2, no_update, current_register_cls
     result = register_user(username.strip(), password)
     if result["success"]:
-        return html.Span("✅ 注册成功！请登录", className="auth-success-text"), "", "", "", (n_login_show or 0) + 1
+        return html.Span("✅ 注册成功！请登录", className="auth-success-text"), "", "", "", "auth-modal-overlay", "auth-modal-overlay hidden"
     else:
-        return html.Span(f"⚠️ {result['error']}", className="auth-error-text"), username, password, password2, no_update
+        return html.Span(f"⚠️ {result['error']}", className="auth-error-text"), username, password, password2, no_update, current_register_cls
 
 
 @app.callback(
@@ -1109,7 +1123,7 @@ def handle_target_create_and_refresh(n_create, user_data, refresh, name, target,
 
 
 @app.callback(
-    [Output("edit-target-modal-container", "className"),
+    [Output("edit-target-modal-container", "className", allow_duplicate=True),
      Output("editing-target-id", "data"),
      Output("edit-target-name", "value"),
      Output("edit-target-target", "value"),
@@ -1126,11 +1140,12 @@ def handle_target_create_and_refresh(n_create, user_data, refresh, name, target,
      State("edit-target-current", "value"),
      State("edit-target-unit", "value"),
      State("edit-target-public", "value"),
-     State("user-store", "data")],
+     State("user-store", "data"),
+     State("edit-target-modal-container", "className")],
     prevent_initial_call=True
 )
 def handle_edit_target_modal(edit_clicks_list, close_clicks, save_clicks,
-                             editing_id, name, target, current, unit, public, user_data):
+                             editing_id, name, target, current, unit, public, user_data, current_edit_cls):
     ctx = callback_context
     if not ctx.triggered:
         return ["auth-modal-overlay hidden", None, "", None, None, "", [], ""]
@@ -1146,19 +1161,19 @@ def handle_edit_target_modal(edit_clicks_list, close_clicks, save_clicks,
         if not save_clicks or save_clicks == 0:
             return no_update
         if not user_data:
-            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+            return [current_edit_cls, no_update, no_update, no_update, no_update, no_update, no_update,
                     html.Span("⚠️ 请先登录", className="auth-error-text")]
         if editing_id is None:
-            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+            return [current_edit_cls, no_update, no_update, no_update, no_update, no_update, no_update,
                     html.Span("⚠️ 未选择目标", className="auth-error-text")]
         if not name or not name.strip():
-            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+            return [current_edit_cls, no_update, no_update, no_update, no_update, no_update, no_update,
                     html.Span("⚠️ 请填写目标名称", className="auth-error-text")]
         if target is None or target <= 0:
-            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+            return [current_edit_cls, no_update, no_update, no_update, no_update, no_update, no_update,
                     html.Span("⚠️ 目标值必须大于0", className="auth-error-text")]
         if current is None or current < 0:
-            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+            return [current_edit_cls, no_update, no_update, no_update, no_update, no_update, no_update,
                     html.Span("⚠️ 当前值不能小于0", className="auth-error-text")]
         is_public = 1 if public and "public" in public else 0
         result = update_target(
@@ -1172,7 +1187,7 @@ def handle_edit_target_modal(edit_clicks_list, close_clicks, save_clicks,
         if result["success"]:
             return ["auth-modal-overlay hidden", None, "", None, None, "", [], ""]
         else:
-            return [no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+            return [current_edit_cls, no_update, no_update, no_update, no_update, no_update, no_update,
                     html.Span(f"⚠️ {result['error']}", className="auth-error-text")]
 
     if "type" in trigger_prop and "edit-target-btn" in trigger_prop:
@@ -1489,18 +1504,21 @@ def handle_alert_config_save(n_clicks, thresholds, threshold_ids, levels, level_
 
 
 @app.callback(
-    Output("io-status", "children"),
+    [Output("io-status", "children"),
+     Output("targets-store", "data", allow_duplicate=True),
+     Output("refresh-trigger", "data", allow_duplicate=True)],
     [Input("upload-data", "contents")],
     [State("upload-data", "filename"),
-     State("user-store", "data")],
+     State("user-store", "data"),
+     State("refresh-trigger", "data")],
     prevent_initial_call=True
 )
-def handle_import_status(contents, filename, user_data):
+def handle_import_status(contents, filename, user_data, current_refresh):
     if contents is None:
-        return no_update
+        return no_update, no_update, no_update
     parsed, error = parse_uploaded_file(contents, filename)
     if error:
-        return no_update
+        return no_update, no_update, no_update
     if user_data:
         for item in parsed:
             create_target(
@@ -1511,13 +1529,15 @@ def handle_import_status(contents, filename, user_data):
             html.Span("✅", className="status-icon"),
             f" 成功导入并创建 {len(parsed)} 条目标数据！"
         ], className="io-success")
-        return success
+        new_refresh = (current_refresh or 0) + 1
+        updated_targets = get_visible_targets(user_data["user_id"])
+        return success, updated_targets, new_refresh
     else:
         success = html.Div([
             html.Span("✅", className="status-icon"),
             f" 成功解析 {len(parsed)} 条目标数据！（登录后可导入创建为自己的目标）"
         ], className="io-success")
-        return success
+        return success, no_update, no_update
 
 
 if __name__ == "__main__":
