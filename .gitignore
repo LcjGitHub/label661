@@ -126,3 +126,6 @@ tmp/
 *.xls
 *.xlsm
 *.xlsb
+
+# App data
+history_snapshots.json

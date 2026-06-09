@@ -50,6 +50,21 @@ def create_trend_chart(selected_targets, history):
     fig = go.Figure()
     colors = ["#667eea", "#764ba2", "#00C853", "#FFB300", "#FF5252", "#00BCD4"]
     
+    if not selected_targets:
+        fig.add_annotation(
+            text="请从上方下拉框选择要查看的目标",
+            xref="paper", yref="paper",
+            x=0.5, y=0.5,
+            showarrow=False,
+            font=dict(size=16, color="#999")
+        )
+        fig.update_layout(
+            height=450,
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+        )
+        return fig
+    
     if not history:
         fig.add_annotation(
             text="暂无历史数据，请点击上方按钮保存快照",
@@ -253,7 +268,7 @@ app.layout = html.Div([
                 dcc.Dropdown(
                     id="target-selector",
                     options=[{"label": name, "value": name} for name in get_target_names()],
-                    value=[get_target_names()[0]] if get_target_names() else [],
+                    value=[],
                     multi=True,
                     placeholder="请选择要查看的目标...",
                     className="target-dropdown"
@@ -266,7 +281,7 @@ app.layout = html.Div([
         dcc.Graph(
             id="trend-chart",
             figure=create_trend_chart(
-                [get_target_names()[0]] if get_target_names() else [],
+                [],
                 load_history()
             ),
             config={'displayModeBar': True, 'displaylogo': False},
@@ -318,6 +333,6 @@ def handle_trend_updates(n_clicks, selected_targets, current_history):
 
 
 if __name__ == "__main__":
-    print("🚀 正在启动目标完成进度页面...")
-    print("📊 访问地址：http://127.0.0.1:8051")
-    app.run(debug=True, host="127.0.0.1", port=8051)
+    print("正在启动目标完成进度页面...")
+    print("访问地址：http://127.0.0.1:8050")
+    app.run(debug=True, host="127.0.0.1", port=8050)
