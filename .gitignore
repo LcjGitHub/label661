@@ -1,0 +1,123 @@
+# Dependencies
+node_modules/
+bower_components/
+jspm_packages/
+vendor/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.env/
+pip-wheel-metadata/
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Java / Kotlin / Scala
+target/
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+build/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Go
+vendor/
+
+# Rust
+target/
+
+# Package / build output
+dist/
+out/
+build/
+release/
+*.min.js
+*.min.css
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+.parcel-cache/
+.cache/
+coverage/
+lib-cov/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime / env
+.env
+.env.*
+!.env.example
+*.local
+
+# IDE / editor
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Test / coverage
+.nyc_output/
+coverage/
+htmlcov/
+.pytest_cache/
+.tox/
+.hypothesis/
+
+# Misc cache / temp
+.tmp/
+temp/
+tmp/
+*.tmp
+*.temp
+*.bak
+*.cache
+.sass-cache/
+.eslintcache
+.stylelintcache
+.turbo/
+.vercel/
+.netlify/
+
+# Archives (optional local bundles)
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
