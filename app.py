@@ -43,7 +43,10 @@ from database import (
     save_prediction,
     get_latest_prediction_by_target,
     get_latest_prediction_by_target_name,
-    get_ranking_targets
+    get_ranking_targets,
+    get_targets_by_ids,
+    get_targets_by_names,
+    calculate_comparison_metrics
 )
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
@@ -641,6 +644,322 @@ def create_ranking_section(completion_top5, progress_top5):
             ], className="ranking-column ranking-progress-column")
         ], className="ranking-columns")
     ], className="ranking-section-body")
+
+
+def create_comparison_radar_chart(comparison_data):
+    fig = go.Figure()
+    colors = ["#667eea", "#764ba2", "#00C853", "#FFB300", "#FF5252", "#00BCD4"]
+
+    if not comparison_data:
+        fig.add_annotation(
+            text="请选择至少两个目标进行对比",
+            xref="paper", yref="paper",
+            x=0.5, y=0.5,
+            showarrow=False,
+            font=dict(size=16, color="#999")
+        )
+        fig.update_layout(
+            height=450,
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+        )
+        return fig
+
+    categories = ["完成率得分", "增长速度", "效率得分", "时间得分", "综合得分"]
+
+    for idx, data in enumerate(comparison_data):
+        values = [
+            data.get("completion_score", 0),
+            data.get("growth_score", 0),
+            data.get("efficiency_score", 0),
+            data.get("time_score", 0),
+            data.get("overall_score", 0)
+        ]
+        color = colors[idx % len(colors)]
+        if len(color.lstrip('#')) == 6:
+            r_val = int(color.lstrip('#')[0:2], 16)
+            g_val = int(color.lstrip('#')[2:4], 16)
+            b_val = int(color.lstrip('#')[4:6], 16)
+            fillcolor = f"rgba({r_val}, {g_val}, {b_val}, 0.2)"
+        else:
+            fillcolor = color + "33"
+        fig.add_trace(go.Scatterpolar(
+            r=values,
+            theta=categories,
+            fill='toself',
+            name=data["name"],
+            line=dict(color=color, width=2),
+            fillcolor=fillcolor,
+            hovertemplate=f"<b>{data['name']}</b><br>%{{theta}}: %{{r}}<extra></extra>"
+        ))
+
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100],
+                tickfont=dict(size=10),
+                gridcolor="#e0e0e0"
+            ),
+            angularaxis=dict(
+                tickfont=dict(size=12, color="#333"),
+                gridcolor="#e0e0e0"
+            ),
+            bgcolor="#fafafa"
+        ),
+        height=450,
+        paper_bgcolor="white",
+        font={"family": "Microsoft YaHei", "size": 12, "color": "#333"},
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            font={"size": 12}
+        ),
+        margin={"l": 40, "r": 40, "t": 60, "b": 40},
+        title={
+            'text': '🎯 多维度能力雷达图',
+            'y': 0.98,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=16, color='#333')
+        }
+    )
+
+    return fig
+
+
+def create_comparison_bar_chart(comparison_data):
+    fig = go.Figure()
+    colors = ["#667eea", "#764ba2", "#00C853", "#FFB300", "#FF5252", "#00BCD4"]
+
+    if not comparison_data:
+        fig.add_annotation(
+            text="请选择至少两个目标进行对比",
+            xref="paper", yref="paper",
+            x=0.5, y=0.5,
+            showarrow=False,
+            font=dict(size=16, color="#999")
+        )
+        fig.update_layout(
+            height=450,
+            paper_bgcolor="white",
+            plot_bgcolor="white",
+        )
+        return fig
+
+    target_names = [d["name"] for d in comparison_data]
+
+    fig.add_trace(go.Bar(
+        name="完成率 (%)",
+        x=target_names,
+        y=[d["completion"] for d in comparison_data],
+        marker_color="#667eea",
+        text=[f"{d['completion']}%" for d in comparison_data],
+        textposition='outside',
+        hovertemplate="完成率: %{y}%<extra></extra>"
+    ))
+
+    fig.add_trace(go.Bar(
+        name="日均增长 (%/天)",
+        x=target_names,
+        y=[d.get("history_avg_growth", d.get("avg_daily_growth", 0)) for d in comparison_data],
+        marker_color="#00C853",
+        text=[f"{d.get('history_avg_growth', d.get('avg_daily_growth', 0)):.2f}" for d in comparison_data],
+        textposition='outside',
+        hovertemplate="日均增长: %{y}%/天<extra></extra>"
+    ))
+
+    fig.add_trace(go.Bar(
+        name="综合得分",
+        x=target_names,
+        y=[d["overall_score"] for d in comparison_data],
+        marker_color="#FFB300",
+        text=[f"{d['overall_score']}" for d in comparison_data],
+        textposition='outside',
+        hovertemplate="综合得分: %{y}<extra></extra>"
+    ))
+
+    fig.update_layout(
+        barmode='group',
+        height=450,
+        paper_bgcolor="white",
+        plot_bgcolor="#fafafa",
+        font={"family": "Microsoft YaHei", "size": 12, "color": "#333"},
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            font={"size": 12}
+        ),
+        xaxis=dict(
+            title="目标名称",
+            showgrid=True,
+            gridcolor="#e0e0e0",
+            title_font={"size": 14},
+            tickfont={"size": 11}
+        ),
+        yaxis=dict(
+            title="数值",
+            showgrid=True,
+            gridcolor="#e0e0e0",
+            title_font={"size": 14}
+        ),
+        margin={"l": 60, "r": 30, "t": 80, "b": 80},
+        title={
+            'text': '📊 关键指标对比柱状图',
+            'y': 0.98,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top',
+            'font': dict(size=16, color='#333')
+        },
+        hovermode="x unified"
+    )
+
+    return fig
+
+
+def create_comparison_detail_card(data, idx):
+    colors = ["#667eea", "#764ba2", "#00C853", "#FFB300", "#FF5252", "#00BCD4"]
+    color = colors[idx % len(colors)]
+
+    advantages = data.get("advantages", [])
+    disadvantages = data.get("disadvantages", [])
+
+    rank_badges = []
+    if data.get("overall_score_rank"):
+        rank_text = f"综合排名: 第{data['overall_score_rank']}"
+        if data["overall_score_rank"] == 1:
+            rank_badges.append(html.Span("🏆 " + rank_text, className="comparison-rank-badge comparison-rank-gold"))
+        elif data["overall_score_rank"] == 2:
+            rank_badges.append(html.Span("🥈 " + rank_text, className="comparison-rank-badge comparison-rank-silver"))
+        elif data["overall_score_rank"] == 3:
+            rank_badges.append(html.Span("🥉 " + rank_text, className="comparison-rank-badge comparison-rank-bronze"))
+        else:
+            rank_badges.append(html.Span(rank_text, className="comparison-rank-badge"))
+
+    adv_items = [html.Span(f"✅ {a}", className="comparison-advantage") for a in advantages]
+    disadv_items = [html.Span(f"⚠️ {d}", className="comparison-disadvantage") for d in disadvantages]
+
+    est_days = data.get("estimated_days_remaining")
+    if est_days is not None:
+        est_text = f"{est_days} 天"
+    else:
+        est_text = data.get("estimated_completion_date", "无法预测")
+
+    growth_rate = data.get("history_avg_growth", data.get("avg_daily_growth", 0))
+    growth_text = f"{growth_rate:.4f}%/天"
+
+    return html.Div([
+        html.Div([
+            html.Div([
+                html.Span(data["name"], className="comparison-card-title"),
+                html.Div(rank_badges, className="comparison-rank-container")
+            ], className="comparison-card-header", style={"border-left": f"4px solid {color}"}),
+            html.Div([
+                html.Div([
+                    html.Div([
+                        html.Span("完成率", className="comparison-metric-label"),
+                        html.Span(f"{data['completion']}%", className="comparison-metric-value", style={"color": color})
+                    ], className="comparison-metric"),
+                    html.Div([
+                        html.Span("综合得分", className="comparison-metric-label"),
+                        html.Span(f"{data['overall_score']}", className="comparison-metric-value", style={"color": color})
+                    ], className="comparison-metric")
+                ], className="comparison-metrics-row"),
+                html.Div([
+                    html.Div([
+                        html.Span("日均增速", className="comparison-metric-label"),
+                        html.Span(growth_text, className="comparison-metric-value")
+                    ], className="comparison-metric"),
+                    html.Div([
+                        html.Span("剩余完成", className="comparison-metric-label"),
+                        html.Span(est_text, className="comparison-metric-value")
+                    ], className="comparison-metric")
+                ], className="comparison-metrics-row"),
+                html.Div([
+                    html.Div([
+                        html.Span("已进行", className="comparison-metric-label"),
+                        html.Span(f"{data.get('elapsed_days', 0)} 天", className="comparison-metric-value")
+                    ], className="comparison-metric"),
+                    html.Div([
+                        html.Span("剩余量", className="comparison-metric-label"),
+                        html.Span(f"{data['remaining_value']:,} {data.get('unit', '')}", className="comparison-metric-value")
+                    ], className="comparison-metric")
+                ], className="comparison-metrics-row")
+            ], className="comparison-metrics-body")
+        ], className="comparison-card-body"),
+        html.Div([
+            html.Div([
+                html.Span("💪 优势", className="comparison-subtitle"),
+                html.Div(adv_items if adv_items else [html.Span("暂无明显优势", className="comparison-empty")], className="comparison-tags")
+            ], className="comparison-advantages-section"),
+            html.Div([
+                html.Span("🎯 待改进", className="comparison-subtitle"),
+                html.Div(disadv_items if disadv_items else [html.Span("表现良好，继续保持！", className="comparison-empty")], className="comparison-tags")
+            ], className="comparison-disadvantages-section")
+        ], className="comparison-analysis-body")
+    ], className="comparison-detail-card", style={"border-top": f"3px solid {color}"})
+
+
+def create_comparison_section(comparison_data):
+    if not comparison_data:
+        return html.Div([
+            html.Div([
+                html.H2("📊 多目标进度对比", className="section-title"),
+                html.Div([
+                    html.Label("选择要对比的目标（至少选择2个或以上）：", className="comparison-label"),
+                    html.Div("从上方下拉框中选择多个目标进行详细对比分析", className="comparison-hint")
+                ], className="comparison-empty-state")
+            ], className="comparison-header")
+        ], className="comparison-section")
+
+    detail_cards = [
+        create_comparison_detail_card(data, idx)
+        for idx, data in enumerate(comparison_data)
+    ]
+
+    return html.Div([
+        html.Div([
+            html.Div([
+                html.H2("📊 多目标进度对比", className="section-title"),
+                html.Div([
+                    html.Div([
+                        html.Span(f"共选择 {len(comparison_data)} 个目标进行对比", className="comparison-count"),
+                        html.Span("💡 提示：可查看雷达图查看多维度能力，柱状图查看关键指标", className="comparison-tip")
+                    ], className="comparison-info-row")
+                ], className="comparison-info")
+            ], className="comparison-header"),
+            html.Div([
+                html.Div([
+                    dcc.Graph(
+                        id="comparison-radar-chart",
+                        figure=create_comparison_radar_chart(comparison_data),
+                        config={'displayModeBar': True, 'displaylogo': False},
+                        className="comparison-chart"
+                    )
+                ], className="comparison-chart-container comparison-radar-container"),
+                html.Div([
+                    dcc.Graph(
+                        id="comparison-bar-chart",
+                        figure=create_comparison_bar_chart(comparison_data),
+                        config={'displayModeBar': True, 'displaylogo': False},
+                        className="comparison-chart"
+                    )
+                ], className="comparison-chart-container comparison-bar-container")
+            ], className="comparison-charts-row"),
+            html.Div([
+                html.H3("📋 详细对比分析", className="comparison-detail-title"),
+                html.Div(detail_cards, className="comparison-detail-grid")
+            ], className="comparison-detail-section")
+        ], className="comparison-section-body")
+    ], className="comparison-section")
 
 
 def create_trend_chart(selected_targets, history, targets_data=None):
@@ -1649,6 +1968,30 @@ app.layout = html.Div([
                 ], className="trend-section"),
 
                 html.Div(
+                    id="comparison-container",
+                    className="comparison-section-wrapper",
+                    children=[
+                        html.Div([
+                            html.H2("📊 多目标进度对比", className="section-title"),
+                            html.Div([
+                                html.Div([
+                                    html.Label("选择目标进行对比（至少选择2个）：", className="comparison-selector-label"),
+                                    dcc.Dropdown(
+                                        id="comparison-target-selector",
+                                        options=[{"label": name, "value": name} for name in get_target_names(initial_targets)],
+                                        value=[],
+                                        multi=True,
+                                        placeholder="请选择要对比的目标...",
+                                        className="comparison-target-dropdown"
+                                    )
+                                ], className="comparison-selector-controls")
+                            ], className="comparison-selector")
+                        ], className="comparison-header-wrapper"),
+                        html.Div(id="comparison-content", className="comparison-content", children=create_comparison_section([]))
+                    ]
+                ),
+
+                html.Div(
                     id="ranking-container",
                     className="ranking-section-wrapper",
                     children=[
@@ -2180,6 +2523,42 @@ def handle_trend_updates(n_clicks, selected_targets, current_targets, current_hi
     predictions = [predict_target_completion(t, history, targets) for t in sel]
 
     return history, status, fig, count_text, options, create_prediction_info_panel(predictions)
+
+
+@app.callback(
+    [Output("comparison-content", "children"),
+     Output("comparison-target-selector", "options")],
+    [Input("comparison-target-selector", "value"),
+     Input("targets-store", "data"),
+     Input("history-store", "data"),
+     Input("user-store", "data")],
+    prevent_initial_call=False
+)
+def render_comparison_section(selected_names, targets_data, history_data, user_data):
+    ctx = callback_context
+    user_id = user_data["user_id"] if user_data else None
+    targets = targets_data or get_visible_targets(user_id)
+    history = history_data or load_history()
+    options = [{"label": name, "value": name} for name in get_target_names(targets)]
+
+    if not ctx.triggered:
+        return create_comparison_section([]), options
+
+    if not selected_names or len(selected_names) < 2:
+        return create_comparison_section([]), options
+
+    targets_to_compare = []
+    for name in selected_names:
+        for t in targets:
+            if t["name"] == name:
+                targets_to_compare.append(t)
+                break
+
+    if len(targets_to_compare) < 2:
+        return create_comparison_section([]), options
+
+    comparison_metrics = calculate_comparison_metrics(targets_to_compare, history)
+    return create_comparison_section(comparison_metrics), options
 
 
 @app.callback(

@@ -446,5 +446,254 @@ def get_ranking_targets(user_id=None):
     return [_row_to_ranking_dict(r) for r in rows]
 
 
+def get_targets_by_ids(target_ids):
+    if not target_ids:
+        return []
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    placeholders = ",".join(["?"] * len(target_ids))
+    cursor.execute(f"SELECT * FROM targets WHERE id IN ({placeholders})", target_ids)
+    rows = cursor.fetchall()
+    conn.close()
+    return [row_to_target_dict(r) for r in rows]
+
+
+def get_targets_by_names(target_names, user_id=None):
+    if not target_names:
+        return []
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    placeholders = ",".join(["?"] * len(target_names))
+    params = list(target_names)
+    query = f"SELECT * FROM targets WHERE name IN ({placeholders})"
+    if user_id is not None:
+        query += " AND (user_id = ? OR is_public = 1)"
+        params.append(user_id)
+    else:
+        query += " AND is_public = 1"
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    conn.close()
+    return [row_to_target_dict(r) for r in rows]
+
+
+def calculate_comparison_metrics(targets_data, history_data=None):
+    """
+    计算多个目标的对比指标
+    返回包含每个目标详细对比数据的列表
+    """
+    from datetime import datetime, timedelta
+
+    results = []
+    now = datetime.now()
+
+    for target in targets_data:
+        metrics = {
+            "id": target.get("id"),
+            "name": target["name"],
+            "target": target["target"],
+            "current": target["current"],
+            "unit": target.get("unit", ""),
+            "completion": target["completion"],
+            "created_at": target.get("created_at", ""),
+            "updated_at": target.get("updated_at", ""),
+            "remaining_value": round(target["target"] - target["current"], 2),
+            "completion_score": 0,
+            "growth_score": 0,
+            "efficiency_score": 0,
+            "time_score": 0,
+            "overall_score": 0
+        }
+
+        elapsed_days = 0
+        if metrics["created_at"]:
+            try:
+                created_dt = datetime.strptime(metrics["created_at"], "%Y-%m-%d %H:%M:%S")
+                elapsed_days = (now - created_dt).total_seconds() / 86400.0
+                metrics["elapsed_days"] = round(elapsed_days, 1)
+            except ValueError:
+                metrics["elapsed_days"] = 0
+        else:
+            metrics["elapsed_days"] = 0
+
+        avg_daily_growth = 0
+        if elapsed_days > 0:
+            avg_daily_growth = target["completion"] / elapsed_days
+            metrics["avg_daily_growth"] = round(avg_daily_growth, 4)
+        else:
+            metrics["avg_daily_growth"] = 0
+
+        if history_data:
+            earliest_completion = None
+            earliest_timestamp = None
+            latest_completion = target["completion"]
+            latest_timestamp = None
+
+            for snapshot in history_data:
+                try:
+                    snap_dt = datetime.strptime(snapshot["timestamp"], "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    continue
+                for t in snapshot["targets"]:
+                    if t["name"] == target["name"]:
+                        if earliest_timestamp is None or snap_dt < earliest_timestamp:
+                            earliest_timestamp = snap_dt
+                            earliest_completion = t["completion"]
+                        if latest_timestamp is None or snap_dt > latest_timestamp:
+                            latest_timestamp = snap_dt
+                            latest_completion = t["completion"]
+                        break
+
+            if earliest_completion is not None and earliest_timestamp is not None:
+                history_days = 1
+                if latest_timestamp:
+                    history_days = max(1, (latest_timestamp - earliest_timestamp).total_seconds() / 86400.0)
+                actual_growth = latest_completion - earliest_completion
+                metrics["actual_growth"] = round(actual_growth, 2)
+                metrics["history_days"] = round(history_days, 1)
+                metrics["history_avg_growth"] = round(actual_growth / history_days, 4) if history_days > 0 else 0
+                metrics["data_points"] = sum(
+                    1 for s in history_data if any(t["name"] == target["name"] for t in s["targets"])
+                )
+            else:
+                metrics["actual_growth"] = 0
+                metrics["history_days"] = 0
+                metrics["history_avg_growth"] = 0
+                metrics["data_points"] = 0
+        else:
+            metrics["actual_growth"] = 0
+            metrics["history_days"] = 0
+            metrics["history_avg_growth"] = 0
+            metrics["data_points"] = 0
+
+        growth_rate = metrics.get("history_avg_growth", metrics["avg_daily_growth"])
+        if growth_rate > 0:
+            remaining_completion = 100 - target["completion"]
+            estimated_days = remaining_completion / growth_rate
+            metrics["estimated_days_remaining"] = round(estimated_days, 1)
+            try:
+                estimated_completion_date = now + timedelta(days=estimated_days)
+                metrics["estimated_completion_date"] = estimated_completion_date.strftime("%Y-%m-%d")
+            except OverflowError:
+                metrics["estimated_days_remaining"] = None
+                metrics["estimated_completion_date"] = "无法预测"
+        else:
+            metrics["estimated_days_remaining"] = None
+            metrics["estimated_completion_date"] = "无法预测（增长停滞）"
+
+        if target["completion"] >= 90:
+            metrics["completion_score"] = 100
+        elif target["completion"] >= 70:
+            metrics["completion_score"] = 80
+        elif target["completion"] >= 50:
+            metrics["completion_score"] = 60
+        elif target["completion"] >= 30:
+            metrics["completion_score"] = 40
+        else:
+            metrics["completion_score"] = 20
+
+        eff_growth = metrics.get("history_avg_growth", metrics["avg_daily_growth"])
+        if eff_growth >= 5:
+            metrics["growth_score"] = 100
+        elif eff_growth >= 3:
+            metrics["growth_score"] = 80
+        elif eff_growth >= 1:
+            metrics["growth_score"] = 60
+        elif eff_growth >= 0.5:
+            metrics["growth_score"] = 40
+        elif eff_growth > 0:
+            metrics["growth_score"] = 20
+        else:
+            metrics["growth_score"] = 0
+
+        if metrics["estimated_days_remaining"] is not None:
+            if metrics["estimated_days_remaining"] <= 7:
+                metrics["time_score"] = 100
+            elif metrics["estimated_days_remaining"] <= 30:
+                metrics["time_score"] = 80
+            elif metrics["estimated_days_remaining"] <= 90:
+                metrics["time_score"] = 60
+            elif metrics["estimated_days_remaining"] <= 180:
+                metrics["time_score"] = 40
+            else:
+                metrics["time_score"] = 20
+        else:
+            metrics["time_score"] = 0
+
+        if elapsed_days > 0:
+            expected_daily = 100 / max(elapsed_days, 1) if target["completion"] < 100 else 100 / max(elapsed_days, 1)
+            actual_daily = target["completion"] / max(elapsed_days, 1)
+            if expected_daily > 0:
+                efficiency_ratio = min(1.0, actual_daily / (expected_daily * 1.5))
+                metrics["efficiency_score"] = round(efficiency_ratio * 100, 1)
+            else:
+                metrics["efficiency_score"] = 50
+        else:
+            metrics["efficiency_score"] = 50
+
+        metrics["overall_score"] = round(
+            (metrics["completion_score"] * 0.35 +
+             metrics["growth_score"] * 0.30 +
+             metrics["efficiency_score"] * 0.20 +
+             metrics["time_score"] * 0.15), 1
+        )
+
+        results.append(metrics)
+
+    if results:
+        metrics_keys = ["completion", "avg_daily_growth", "efficiency_score", "overall_score"]
+        for mk in metrics_keys:
+            values = [r[mk] for r in results if isinstance(r.get(mk), (int, float))]
+            if values:
+                max_val = max(values)
+                min_val = min(values)
+                for r in results:
+                    if isinstance(r.get(mk), (int, float)):
+                        if max_val == min_val:
+                            r[f"{mk}_rank"] = 1
+                        else:
+                            sorted_vals = sorted(values, reverse=True)
+                            r[f"{mk}_rank"] = sorted_vals.index(r[mk]) + 1
+                    else:
+                        r[f"{mk}_rank"] = None
+
+        for r in results:
+            advantages = []
+            disadvantages = []
+
+            if r.get("completion_rank") == 1:
+                advantages.append("完成率最高")
+            elif r.get("completion_rank") and r["completion_rank"] <= len(results) / 2:
+                advantages.append("完成率领先")
+            elif r.get("completion_rank"):
+                disadvantages.append("完成率落后")
+
+            if r.get("avg_daily_growth_rank") == 1:
+                advantages.append("增长速度最快")
+            elif r.get("avg_daily_growth_rank") and r["avg_daily_growth_rank"] <= len(results) / 2:
+                advantages.append("增速较快")
+            elif r.get("avg_daily_growth_rank"):
+                disadvantages.append("增速较慢")
+
+            if r.get("overall_score_rank") == 1:
+                advantages.append("综合表现最佳")
+            elif r.get("overall_score_rank") and r["overall_score_rank"] <= len(results) / 2:
+                advantages.append("综合表现优秀")
+            elif r.get("overall_score_rank"):
+                disadvantages.append("综合表现待提升")
+
+            if r["estimated_days_remaining"] is not None:
+                all_estimates = [x["estimated_days_remaining"] for x in results if x["estimated_days_remaining"] is not None]
+                if all_estimates and r["estimated_days_remaining"] == min(all_estimates):
+                    advantages.append("预计最早完成")
+                elif all_estimates and r["estimated_days_remaining"] == max(all_estimates):
+                    disadvantages.append("预计最晚完成")
+
+            r["advantages"] = advantages
+            r["disadvantages"] = disadvantages
+
+    return results
+
+
 init_db()
 seed_default_public_data()
