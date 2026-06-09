@@ -297,16 +297,30 @@ def save_prediction(target_id, target_name, slope, intercept, avg_growth_rate,
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute(
-        """INSERT INTO target_predictions
-           (target_id, target_name, slope, intercept, avg_growth_rate,
-            predicted_completion_date, completion_probability, data_points, r_squared, predicted_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (target_id, target_name, slope, intercept, avg_growth_rate,
-         predicted_completion_date, completion_probability, data_points, r_squared, now)
-    )
+    cursor.execute("SELECT id FROM target_predictions WHERE target_id = ?", (target_id,))
+    existing = cursor.fetchone()
+    if existing:
+        cursor.execute(
+            """UPDATE target_predictions
+               SET target_name = ?, slope = ?, intercept = ?, avg_growth_rate = ?,
+                   predicted_completion_date = ?, completion_probability = ?,
+                   data_points = ?, r_squared = ?, predicted_at = ?
+               WHERE target_id = ?""",
+            (target_name, slope, intercept, avg_growth_rate,
+             predicted_completion_date, completion_probability, data_points, r_squared, now, target_id)
+        )
+        prediction_id = existing["id"]
+    else:
+        cursor.execute(
+            """INSERT INTO target_predictions
+               (target_id, target_name, slope, intercept, avg_growth_rate,
+                predicted_completion_date, completion_probability, data_points, r_squared, predicted_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (target_id, target_name, slope, intercept, avg_growth_rate,
+             predicted_completion_date, completion_probability, data_points, r_squared, now)
+        )
+        prediction_id = cursor.lastrowid
     conn.commit()
-    prediction_id = cursor.lastrowid
     conn.close()
     return get_prediction_by_id(prediction_id)
 

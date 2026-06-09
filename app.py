@@ -255,6 +255,34 @@ def predict_target_completion(target_name, history, targets_data=None):
     except ValueError:
         return None
 
+    target_id = None
+    if targets_data:
+        for t in targets_data:
+            if t["name"] == target_name:
+                target_id = t.get("id")
+                break
+
+    if target_id:
+        try:
+            saved = get_latest_prediction_by_target(target_id)
+            if saved and saved.get("data_points") == len(timestamps):
+                return {
+                    "target_name": target_name,
+                    "slope": saved["slope"],
+                    "intercept": saved["intercept"],
+                    "r_squared": saved["r_squared"],
+                    "avg_growth_rate": round(saved["avg_growth_rate"], 4),
+                    "predicted_completion_date": saved["predicted_completion_date"],
+                    "completion_probability": saved["completion_probability"],
+                    "data_points": saved["data_points"],
+                    "base_datetime": base_dt,
+                    "timestamps": timestamps,
+                    "completions": completions,
+                    "x_hours": x_hours
+                }
+        except Exception:
+            pass
+
     regression = simple_linear_regression(x_hours, completions)
     if regression is None:
         return None
@@ -279,13 +307,6 @@ def predict_target_completion(target_name, history, targets_data=None):
             predicted_completion_date = completion_dt.strftime("%Y-%m-%d %H:%M:%S")
 
     probability = calculate_completion_probability(r_squared, len(timestamps), avg_growth_rate)
-
-    target_id = None
-    if targets_data:
-        for t in targets_data:
-            if t["name"] == target_name:
-                target_id = t.get("id")
-                break
 
     if target_id and predicted_completion_date:
         try:
@@ -370,21 +391,28 @@ def create_prediction_info_panel(predictions):
         data_pts = pred["data_points"]
         r2 = pred["r_squared"]
 
-        if prob >= 80:
-            prob_color = "#00C853"
-        elif prob >= 50:
-            prob_color = "#FFB300"
-        else:
+        no_growth = avg_growth <= 0
+        if no_growth:
+            prob_display = "暂无"
             prob_color = "#FF5252"
+        else:
+            prob_display = f"{prob}%"
+            if prob >= 80:
+                prob_color = "#00C853"
+            elif prob >= 50:
+                prob_color = "#FFB300"
+            else:
+                prob_color = "#FF5252"
 
         pred_date_text = pred_date if pred_date else "无法预测（增长趋势不明显）"
+        r2_text = f"{r2:.4f}" if r2 is not None else "暂无"
 
         items.append(
             html.Div([
                 html.Div([
                     html.Span(f"🎯 {target_name}", className="prediction-target-name"),
                     html.Span(
-                        f"{prob}%",
+                        prob_display,
                         className="prediction-probability",
                         style={"color": prob_color}
                     )
@@ -403,8 +431,8 @@ def create_prediction_info_panel(predictions):
                         html.Span(f"{data_pts} 个快照", className="prediction-value")
                     ], className="prediction-row"),
                     html.Div([
-                        html.Span("拟合优度 R²：", className="prediction-label"),
-                        html.Span(f"{r2:.4f}" if r2 is not None else "N/A", className="prediction-value")
+                        html.Span("拟合优度：", className="prediction-label"),
+                        html.Span(r2_text, className="prediction-value")
                     ], className="prediction-row")
                 ], className="prediction-details")
             ], className="prediction-item")
