@@ -64,7 +64,7 @@ def export_data_to_file(data, file_format="csv"):
         mime = "text/csv"
 
     b64 = base64.b64encode(buffer.read()).decode("utf-8")
-    return dict(content=b64, filename=filename, mime_type=mime, base64=True)
+    return dict(content=b64, filename=filename, mimetype=mime, base64=True)
 
 
 def parse_uploaded_file(contents, filename):
@@ -611,28 +611,45 @@ app.layout = html.Div([
                     n_clicks=0
                 ),
                 html.Button(
-                    [html.Span("�", className="btn-icon"), " 导入数据"],
+                    [html.Span("📤", className="btn-icon"), " 导入数据"],
                     id="import-btn",
                     className="io-btn io-btn-import",
                     n_clicks=0
                 ),
             ], className="io-buttons-group"),
-            dcc.Upload(
-                id="upload-data",
-                children=[],
-                multiple=False,
-                accept=".csv,.xlsx,.xls",
-                className="upload-hidden"
-            ),
         ], className="io-buttons-container"),
         html.Button(
-            [html.Span("�", className="btn-icon"), " 保存当前快照"],
+            [html.Span("📸", className="btn-icon"), " 保存当前快照"],
             id="save-snapshot-btn",
             className="save-snapshot-btn",
             n_clicks=0
         ),
         html.Div(id="save-status", className="save-status"),
         html.Div(id="io-status", className="io-status"),
+        html.Div(id="import-modal-container", className="import-modal-overlay hidden", children=[
+            html.Div(className="import-modal", children=[
+                html.Div(className="import-modal-header", children=[
+                    html.Span("📂 选择数据文件导入", className="import-modal-title"),
+                    html.Button("×", id="import-modal-close", className="import-modal-close-btn")
+                ]),
+                html.Div(className="import-modal-body", children=[
+                    html.Div("支持 Excel (.xlsx, .xls) 和 CSV (.csv) 格式文件", className="import-modal-hint"),
+                    dcc.Upload(
+                        id="upload-data",
+                        children=html.Div(className="upload-zone", children=[
+                            html.Div("📁", className="upload-zone-icon"),
+                            html.Div([
+                                html.Div("点击选择文件或拖拽文件到此处", className="upload-zone-text-main"),
+                                html.Div("文件名应包含：目标名称、当前值、目标值、完成率、单位", className="upload-zone-text-sub")
+                            ], className="upload-zone-texts")
+                        ]),
+                        multiple=False,
+                        accept=".csv,.xlsx,.xls",
+                        className="upload-component"
+                    )
+                ])
+            ])
+        ]),
         html.Div(id="error-modal-container", className="error-modal-overlay hidden", children=[
             html.Div(className="error-modal", children=[
                 html.Div(className="error-modal-header", children=[
@@ -724,22 +741,25 @@ def handle_export(n_excel, n_csv, current_data):
     return no_update
 
 
-app.clientside_callback(
-    """
-    function(n_clicks) {
-        if (n_clicks > 0) {
-            var uploadInput = document.querySelector('#upload-data input[type="file"]');
-            if (uploadInput) {
-                uploadInput.click();
-            }
-        }
-        return window.dash_clientside.no_update;
-    }
-    """,
-    Output("upload-data", "contents"),
-    [Input("import-btn", "n_clicks")],
-    prevent_initial_call=True
+@app.callback(
+    [Output("import-modal-container", "className")],
+    [Input("import-btn", "n_clicks"),
+     Input("import-modal-close", "n_clicks"),
+     Input("upload-data", "contents")],
+    prevent_initial_call=False
 )
+def toggle_import_modal(import_clicks, close_clicks, upload_contents):
+    ctx = callback_context
+    if not ctx.triggered:
+        return ["import-modal-overlay hidden"]
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    if trigger_id == "import-btn" and import_clicks and import_clicks > 0:
+        return ["import-modal-overlay"]
+    if trigger_id == "import-modal-close" and close_clicks and close_clicks > 0:
+        return ["import-modal-overlay hidden"]
+    if trigger_id == "upload-data" and upload_contents is not None:
+        return ["import-modal-overlay hidden"]
+    return no_update
 
 
 @app.callback(
