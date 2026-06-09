@@ -20,6 +20,17 @@ from alert_module import (
     detect_and_log_alerts
 )
 
+from sync_module import (
+    DEFAULT_SYNC_CONFIG,
+    load_sync_config,
+    save_sync_config,
+    load_sync_logs,
+    add_sync_log,
+    perform_sync,
+    calculate_next_sync,
+    get_countdown
+)
+
 from database import (
     register_user,
     login_user,
@@ -794,11 +805,225 @@ def create_edit_target_modal():
     ])
 
 
+def create_sync_status_panel(sync_status, sync_config):
+    is_syncing = sync_status.get("is_syncing", False)
+    last_sync = sync_status.get("last_sync_time", "从未同步")
+    next_sync = sync_status.get("next_sync_time", None)
+    countdown = sync_status.get("countdown", "--")
+    last_message = sync_status.get("last_message", "")
+    has_error = sync_status.get("has_error", False)
+    enabled = sync_config.get("enabled", True)
+
+    status_icon = "🔄" if is_syncing else ("✅" if enabled else "⏸️")
+    status_class = "sync-status sync-status-syncing" if is_syncing else (
+        "sync-status sync-status-error" if has_error else "sync-status sync-status-ready"
+    )
+
+    if is_syncing:
+        status_text = "正在同步数据..."
+    elif has_error:
+        status_text = "同步失败"
+    elif not enabled:
+        status_text = "自动同步已暂停"
+    else:
+        status_text = "自动同步已启用"
+
+    return html.Div([
+        html.Div([
+            html.Div([
+                html.Span(status_icon, className=f"sync-status-icon{' sync-spin' if is_syncing else ''}"),
+                html.Span(status_text, className="sync-status-text"),
+            ], className=status_class),
+            html.Div([
+                html.Button(
+                    [html.Span("🔄", className="btn-icon"), " 立即同步"],
+                    id="manual-sync-btn",
+                    className="manual-sync-btn",
+                    n_clicks=0,
+                    disabled=is_syncing
+                ),
+                html.Button(
+                    [html.Span("⚙️", className="btn-icon"), " 同步设置"],
+                    id="toggle-sync-config-btn",
+                    className="toggle-sync-config-btn",
+                    n_clicks=0
+                ),
+            ], className="sync-buttons-group")
+        ], className="sync-status-header"),
+        html.Div([
+            html.Div([
+                html.Span("上次同步：", className="sync-info-label"),
+                html.Span(last_sync, className="sync-info-value")
+            ], className="sync-info-row"),
+            html.Div([
+                html.Span("下次同步：", className="sync-info-label"),
+                html.Span(
+                    countdown if next_sync else (status_text if not enabled else "计算中..."),
+                    className="sync-info-value sync-countdown-value"
+                )
+            ], className="sync-info-row"),
+            html.Div([
+                html.Span("同步间隔：", className="sync-info-label"),
+                html.Span(
+                    f"{sync_config.get('interval_seconds', 60)} 秒",
+                    className="sync-info-value"
+                )
+            ], className="sync-info-row"),
+        ], className="sync-info-container"),
+        html.Div(last_message, className="sync-message") if last_message else None,
+    ], className="sync-status-panel")
+
+
+def create_sync_config_panel(sync_config):
+    interval = sync_config.get("interval_seconds", 60)
+    enabled = sync_config.get("enabled", True)
+    mock_mode = sync_config.get("mock_mode", True)
+    api_url = sync_config.get("api_url", DEFAULT_SYNC_CONFIG["api_url"])
+    api_timeout = sync_config.get("api_timeout", 10)
+
+    interval_options = [
+        {"label": "10 秒", "value": 10},
+        {"label": "30 秒", "value": 30},
+        {"label": "1 分钟", "value": 60},
+        {"label": "2 分钟", "value": 120},
+        {"label": "5 分钟", "value": 300},
+        {"label": "10 分钟", "value": 600},
+        {"label": "30 分钟", "value": 1800},
+        {"label": "1 小时", "value": 3600},
+    ]
+
+    return html.Div([
+        html.Div("🔄 数据同步配置", className="sync-config-title"),
+        html.Div("配置自动数据同步的各项参数", className="sync-config-subtitle"),
+        html.Div([
+            html.Div([
+                html.Label("启用自动同步：", className="sync-config-label"),
+                dcc.Checklist(
+                    id="sync-enabled-check",
+                    options=[{"label": "  开启自动数据同步", "value": "enabled"}],
+                    value=["enabled"] if enabled else [],
+                    className="sync-config-checkbox"
+                )
+            ], className="sync-config-row"),
+            html.Div([
+                html.Label("同步间隔：", className="sync-config-label"),
+                dcc.Dropdown(
+                    id="sync-interval-dropdown",
+                    options=interval_options,
+                    value=interval,
+                    clearable=False,
+                    className="sync-config-interval-dropdown"
+                )
+            ], className="sync-config-row"),
+            html.Div([
+                html.Label("使用模拟 API：", className="sync-config-label"),
+                dcc.Checklist(
+                    id="sync-mock-mode-check",
+                    options=[{"label": "  使用模拟数据（演示模式）", "value": "mock"}],
+                    value=["mock"] if mock_mode else [],
+                    className="sync-config-checkbox"
+                )
+            ], className="sync-config-row"),
+            html.Div([
+                html.Label("API 地址：", className="sync-config-label"),
+                dcc.Input(
+                    id="sync-api-url-input",
+                    type="text",
+                    value=api_url,
+                    placeholder="例如：https://api.example.com/targets",
+                    className="sync-config-text-input",
+                    disabled=mock_mode
+                )
+            ], className="sync-config-row"),
+            html.Div([
+                html.Label("请求超时（秒）：", className="sync-config-label"),
+                dcc.Input(
+                    id="sync-api-timeout-input",
+                    type="number",
+                    min=1,
+                    max=120,
+                    value=api_timeout,
+                    className="sync-config-number-input",
+                    disabled=mock_mode
+                )
+            ], className="sync-config-row"),
+        ], className="sync-config-list"),
+        html.Div([
+            html.Button(
+                "💾 保存同步配置",
+                id="save-sync-config-btn",
+                className="save-sync-config-btn",
+                n_clicks=0
+            ),
+        ], className="sync-config-actions"),
+        html.Div(id="sync-config-status", className="sync-config-status"),
+        html.Div([
+            html.Div("📋 最近同步记录", className="sync-logs-title"),
+            html.Div(id="sync-logs-container", className="sync-logs-list")
+        ], className="sync-logs-section")
+    ], className="sync-config-panel", style={"display": "none"})
+
+
+def create_sync_logs_list(logs):
+    if not logs:
+        return html.Div("暂无同步记录", className="sync-logs-empty")
+
+    recent_logs = logs[:10]
+    items = []
+    for log in recent_logs:
+        success = log.get("success", False)
+        item_class = "sync-log-item sync-log-success" if success else "sync-log-item sync-log-error"
+        icon = "✅" if success else "❌"
+        elapsed = log.get("details", {}).get("elapsed_seconds", None)
+        elapsed_text = f"（耗时 {elapsed}s）" if elapsed is not None else ""
+
+        items.append(
+            html.Div([
+                html.Div([
+                    html.Span(icon, className="sync-log-icon"),
+                    html.Span(log.get("timestamp", ""), className="sync-log-time"),
+                ], className="sync-log-header"),
+                html.Div(
+                    f"{log.get('message', '')}{elapsed_text}",
+                    className="sync-log-message"
+                )
+            ], className=item_class)
+        )
+    return html.Div(items, className="sync-logs-items")
+
+
+def create_sync_error_toast(error_message):
+    if not error_message:
+        return html.Div(className="sync-error-toast hidden", children="")
+    return html.Div([
+        html.Div([
+            html.Span("⚠️", className="sync-error-icon"),
+            html.Div([
+                html.Div("同步失败", className="sync-error-title"),
+                html.Div(error_message, className="sync-error-message")
+            ], className="sync-error-content"),
+            html.Button("×", id="sync-error-close-btn", className="sync-error-close-btn")
+        ], className="sync-error-body")
+    ], className="sync-error-toast")
+
+
 initial_alert_config = load_alert_config()
 initial_targets = get_visible_targets()
 initial_triggered, initial_alert_logs = detect_and_log_alerts(
     initial_targets, initial_alert_config, prev_triggered_names=None, is_initial_load=True
 )
+
+initial_sync_config = load_sync_config()
+initial_sync_logs = load_sync_logs()
+initial_sync_status = {
+    "is_syncing": False,
+    "last_sync_time": "从未同步",
+    "next_sync_time": None,
+    "countdown": "--",
+    "last_message": "",
+    "has_error": False,
+    "error_message": ""
+}
 
 
 app.layout = html.Div([
@@ -810,8 +1035,13 @@ app.layout = html.Div([
     dcc.Store(id="triggered-alerts-store", data=initial_triggered),
     dcc.Store(id="is-first-load", data=True),
     dcc.Store(id="refresh-trigger", data=0),
+    dcc.Store(id="sync-config-store", data=initial_sync_config),
+    dcc.Store(id="sync-status-store", data=initial_sync_status),
+    dcc.Store(id="sync-logs-store", data=initial_sync_logs),
     dcc.Download(id="download-data"),
     dcc.Interval(id="alert-interval", interval=30000, n_intervals=0),
+    dcc.Interval(id="sync-interval", interval=initial_sync_config.get("interval_seconds", 60) * 1000, n_intervals=0, disabled=not initial_sync_config.get("enabled", True)),
+    dcc.Interval(id="countdown-interval", interval=1000, n_intervals=0),
 
     html.Div([
         html.Div(id="auth-section", className="auth-section-container"),
@@ -851,6 +1081,11 @@ app.layout = html.Div([
         ),
         html.Div(id="save-status", className="save-status"),
         html.Div(id="io-status", className="io-status"),
+        html.Div(
+            id="sync-status-container",
+            children=create_sync_status_panel(initial_sync_status, initial_sync_config),
+            className="sync-status-wrapper"
+        ),
     ], className="header"),
 
     html.Div(id="alert-banner-container", children=create_alert_banner(initial_triggered)),
@@ -946,6 +1181,15 @@ app.layout = html.Div([
     create_register_modal(),
     create_edit_target_modal(),
 
+    html.Div(
+        id="sync-config-container",
+        children=create_sync_config_panel(initial_sync_config)
+    ),
+    html.Div(
+        id="sync-error-toast-container",
+        children=create_sync_error_toast("")
+    ),
+
 ], className="main-container")
 
 
@@ -1006,7 +1250,7 @@ def toggle_auth_modals(n_login_show, n_reg_show, n_login_close, n_reg_close):
      State("login-password", "value"),
      State("user-store", "data"),
      State("login-modal-container", "className")],
-    prevent_initial_call=False
+    prevent_initial_call='initial_duplicate'
 )
 def handle_login_logout(n_login, n_logout, username, password, current_user, current_login_cls):
     ctx = callback_context
@@ -1538,6 +1782,241 @@ def handle_import_status(contents, filename, user_data, current_refresh):
             f" 成功解析 {len(parsed)} 条目标数据！（登录后可导入创建为自己的目标）"
         ], className="io-success")
         return success, no_update, no_update
+
+
+@app.callback(
+    [Output("sync-status-container", "children"),
+     Output("sync-error-toast-container", "children")],
+    [Input("sync-status-store", "data"),
+     Input("sync-config-store", "data"),
+     Input("sync-error-close-btn", "n_clicks")],
+    prevent_initial_call=False
+)
+def update_sync_status_panel(sync_status, sync_config, close_clicks):
+    ctx = callback_context
+    status = sync_status or initial_sync_status
+    config = sync_config or initial_sync_config
+
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0] if ctx.triggered else ""
+
+    if trigger_id == "sync-error-close-btn":
+        return create_sync_status_panel(status, config), create_sync_error_toast("")
+
+    error_msg = status.get("error_message", "") if status.get("has_error", False) else ""
+    return create_sync_status_panel(status, config), create_sync_error_toast(error_msg)
+
+
+@app.callback(
+    [Output("sync-status-store", "data"),
+     Output("targets-store", "data", allow_duplicate=True),
+     Output("refresh-trigger", "data", allow_duplicate=True),
+     Output("sync-logs-store", "data")],
+    [Input("manual-sync-btn", "n_clicks"),
+     Input("sync-interval", "n_intervals")],
+    [State("sync-config-store", "data"),
+     State("sync-status-store", "data"),
+     State("refresh-trigger", "data"),
+     State("user-store", "data")],
+    prevent_initial_call='initial_duplicate'
+)
+def handle_sync_trigger(manual_clicks, sync_n_intervals, sync_config, current_status, current_refresh, user_data):
+    ctx = callback_context
+    config = sync_config or initial_sync_config
+    status = dict(current_status or initial_sync_status)
+    user_id = user_data["user_id"] if user_data else None
+
+    if not ctx.triggered:
+        return status, no_update, no_update, load_sync_logs()
+
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if trigger_id == "sync-interval":
+        if not config.get("enabled", True):
+            return status, no_update, no_update, no_update
+        if sync_n_intervals is None or sync_n_intervals == 0:
+            return status, no_update, no_update, no_update
+
+    if trigger_id == "manual-sync-btn":
+        if not manual_clicks or manual_clicks == 0:
+            return status, no_update, no_update, no_update
+
+    if status.get("is_syncing", False):
+        return status, no_update, no_update, no_update
+
+    status["is_syncing"] = True
+    status["has_error"] = False
+    status["error_message"] = ""
+    status["last_message"] = "正在从外部 API 获取数据..."
+
+    sync_result = perform_sync(config)
+
+    status["is_syncing"] = False
+
+    if sync_result["success"]:
+        status["last_sync_time"] = sync_result["timestamp"]
+        status["last_message"] = sync_result["message"]
+        status["has_error"] = False
+        status["error_message"] = ""
+
+        next_sync = calculate_next_sync(
+            sync_result["timestamp"],
+            config.get("interval_seconds", 60)
+        )
+        status["next_sync_time"] = next_sync
+        status["countdown"] = get_countdown(next_sync)
+
+        synced_data = sync_result["data"]
+        existing_targets = get_visible_targets(user_id)
+        existing_names = {t["name"]: t for t in existing_targets}
+
+        updated_any = False
+        for item in synced_data:
+            if item["name"] in existing_names:
+                existing = existing_names[item["name"]]
+                if user_id is not None and existing.get("user_id") == user_id:
+                    update_target(
+                        existing["id"], user_id,
+                        current=item["current"],
+                        target=item["target"],
+                        unit=item.get("unit", existing.get("unit", ""))
+                    )
+                    updated_any = True
+
+        new_refresh = (current_refresh or 0) + 1
+        updated_targets = get_visible_targets(user_id)
+        sync_logs = load_sync_logs()
+        return status, updated_targets, new_refresh, sync_logs
+    else:
+        status["last_sync_time"] = sync_result["timestamp"]
+        status["last_message"] = f"同步失败：{sync_result['message']}"
+        status["has_error"] = True
+        status["error_message"] = sync_result["message"]
+        sync_logs = load_sync_logs()
+        return status, no_update, no_update, sync_logs
+
+
+@app.callback(
+    Output("sync-status-store", "data", allow_duplicate=True),
+    [Input("countdown-interval", "n_intervals")],
+    [State("sync-status-store", "data"),
+     State("sync-config-store", "data")],
+    prevent_initial_call=True
+)
+def update_countdown(n_intervals, current_status, sync_config):
+    status = dict(current_status or initial_sync_status)
+    config = sync_config or initial_sync_config
+
+    if status.get("is_syncing", False):
+        return status
+
+    if not config.get("enabled", True):
+        status["countdown"] = "--"
+        status["next_sync_time"] = None
+        return status
+
+    next_sync = status.get("next_sync_time", None)
+    if next_sync is None:
+        if status.get("last_sync_time") and status["last_sync_time"] != "从未同步":
+            next_sync = calculate_next_sync(
+                status["last_sync_time"],
+                config.get("interval_seconds", 60)
+            )
+            status["next_sync_time"] = next_sync
+
+    status["countdown"] = get_countdown(next_sync)
+    return status
+
+
+@app.callback(
+    Output("sync-interval", "interval"),
+    Output("sync-interval", "disabled"),
+    [Input("sync-config-store", "data")],
+    prevent_initial_call=False
+)
+def update_sync_interval(sync_config):
+    config = sync_config or initial_sync_config
+    interval_ms = config.get("interval_seconds", 60) * 1000
+    disabled = not config.get("enabled", True)
+    return interval_ms, disabled
+
+
+@app.callback(
+    Output("sync-config-container", "style"),
+    [Input("toggle-sync-config-btn", "n_clicks")],
+    [State("sync-config-container", "style")],
+    prevent_initial_call=True
+)
+def toggle_sync_config_panel(toggle_clicks, current_style):
+    if not toggle_clicks or toggle_clicks == 0:
+        return no_update
+
+    style = dict(current_style or {})
+    if style.get("display", "none") == "none":
+        style["display"] = "block"
+    else:
+        style["display"] = "none"
+    return style
+
+
+@app.callback(
+    Output("sync-api-url-input", "disabled"),
+    Output("sync-api-timeout-input", "disabled"),
+    [Input("sync-mock-mode-check", "value")],
+    prevent_initial_call=False
+)
+def update_api_inputs_disabled(mock_value):
+    is_mock = bool(mock_value and "mock" in mock_value)
+    return is_mock, is_mock
+
+
+@app.callback(
+    [Output("sync-config-store", "data"),
+     Output("sync-config-status", "children"),
+     Output("sync-logs-container", "children")],
+    [Input("save-sync-config-btn", "n_clicks"),
+     Input("sync-logs-store", "data")],
+    [State("sync-enabled-check", "value"),
+     State("sync-interval-dropdown", "value"),
+     State("sync-mock-mode-check", "value"),
+     State("sync-api-url-input", "value"),
+     State("sync-api-timeout-input", "value"),
+     State("sync-config-store", "data")],
+    prevent_initial_call=False
+)
+def handle_sync_config_and_logs(save_clicks, sync_logs, enabled_val, interval_val, mock_val,
+                                api_url, api_timeout, current_config):
+    ctx = callback_context
+    logs = sync_logs or load_sync_logs()
+
+    if not ctx.triggered:
+        return current_config or initial_sync_config, "", create_sync_logs_list(logs)
+
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if trigger_id == "sync-logs-store":
+        return no_update, no_update, create_sync_logs_list(logs)
+
+    if trigger_id == "save-sync-config-btn":
+        if not save_clicks or save_clicks == 0:
+            return no_update, "", create_sync_logs_list(logs)
+
+        config = dict(current_config or initial_sync_config)
+        config["enabled"] = bool(enabled_val and "enabled" in enabled_val)
+        config["interval_seconds"] = int(interval_val) if interval_val else 60
+        config["mock_mode"] = bool(mock_val and "mock" in mock_val)
+        config["api_url"] = api_url or DEFAULT_SYNC_CONFIG["api_url"]
+        config["api_timeout"] = int(api_timeout) if api_timeout else 10
+
+        save_sync_config(config)
+
+        status_msg = html.Div([
+            html.Span("✅", className="status-icon"),
+            " 同步配置已保存成功！"
+        ], className="config-save-success")
+
+        return config, status_msg, create_sync_logs_list(logs)
+
+    return no_update, no_update, create_sync_logs_list(logs)
 
 
 if __name__ == "__main__":
