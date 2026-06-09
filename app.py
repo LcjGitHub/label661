@@ -39,7 +39,10 @@ from database import (
     update_target,
     delete_target,
     get_visible_targets,
-    get_target_by_id
+    get_target_by_id,
+    save_prediction,
+    get_latest_prediction_by_target,
+    get_latest_prediction_by_target_name
 )
 
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
@@ -199,9 +202,221 @@ def get_target_names(data=None):
     return [item["name"] for item in data]
 
 
-def create_trend_chart(selected_targets, history):
+def simple_linear_regression(x_values, y_values):
+    n = len(x_values)
+    if n < 2:
+        return None
+    sum_x = sum(x_values)
+    sum_y = sum(y_values)
+    sum_xy = sum(x * y for x, y in zip(x_values, y_values))
+    sum_x2 = sum(x * x for x in x_values)
+    denominator = n * sum_x2 - sum_x * sum_x
+    if denominator == 0:
+        return None
+    slope = (n * sum_xy - sum_x * sum_y) / denominator
+    intercept = (sum_y - slope * sum_x) / n
+    ss_res = sum((y - (slope * x + intercept)) ** 2 for x, y in zip(x_values, y_values))
+    mean_y = sum_y / n
+    ss_tot = sum((y - mean_y) ** 2 for y in y_values)
+    r_squared = 1 - (ss_res / ss_tot) if ss_tot != 0 else 0
+    return {"slope": slope, "intercept": intercept, "r_squared": r_squared}
+
+
+def calculate_completion_probability(r_squared, data_points, avg_growth_rate):
+    if avg_growth_rate <= 0:
+        return 0.0
+    base_prob = min(0.95, max(0.1, r_squared)) if r_squared is not None else 0.5
+    data_factor = min(1.0, data_points / 10.0)
+    growth_factor = min(1.0, avg_growth_rate / 5.0) if avg_growth_rate > 0 else 0.0
+    probability = base_prob * (0.3 + 0.35 * data_factor + 0.35 * growth_factor)
+    return round(min(0.99, max(0.0, probability)) * 100, 2)
+
+
+def predict_target_completion(target_name, history, targets_data=None):
+    timestamps = []
+    completions = []
+    for snapshot in history:
+        for target in snapshot["targets"]:
+            if target["name"] == target_name:
+                timestamps.append(snapshot["timestamp"])
+                completions.append(target["completion"])
+                break
+
+    if len(timestamps) < 2:
+        return None
+
+    try:
+        base_dt = datetime.strptime(timestamps[0], "%Y-%m-%d %H:%M:%S")
+        x_hours = []
+        for ts in timestamps:
+            dt = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+            delta = (dt - base_dt).total_seconds() / 3600.0
+            x_hours.append(delta)
+    except ValueError:
+        return None
+
+    regression = simple_linear_regression(x_hours, completions)
+    if regression is None:
+        return None
+
+    slope = regression["slope"]
+    intercept = regression["intercept"]
+    r_squared = regression["r_squared"]
+
+    if len(x_hours) >= 2:
+        total_hours = x_hours[-1] - x_hours[0]
+        total_growth = completions[-1] - completions[0]
+        avg_growth_rate = (total_growth / total_hours * 24) if total_hours > 0 else 0
+    else:
+        avg_growth_rate = slope * 24
+
+    predicted_completion_date = None
+    if slope > 0:
+        hours_to_100 = (100 - intercept) / slope
+        if hours_to_100 >= 0:
+            from datetime import timedelta
+            completion_dt = base_dt + timedelta(hours=hours_to_100)
+            predicted_completion_date = completion_dt.strftime("%Y-%m-%d %H:%M:%S")
+
+    probability = calculate_completion_probability(r_squared, len(timestamps), avg_growth_rate)
+
+    target_id = None
+    if targets_data:
+        for t in targets_data:
+            if t["name"] == target_name:
+                target_id = t.get("id")
+                break
+
+    if target_id and predicted_completion_date:
+        try:
+            save_prediction(
+                target_id=target_id,
+                target_name=target_name,
+                slope=slope,
+                intercept=intercept,
+                avg_growth_rate=avg_growth_rate,
+                predicted_completion_date=predicted_completion_date,
+                completion_probability=probability,
+                data_points=len(timestamps),
+                r_squared=r_squared
+            )
+        except Exception:
+            pass
+
+    return {
+        "target_name": target_name,
+        "slope": slope,
+        "intercept": intercept,
+        "r_squared": r_squared,
+        "avg_growth_rate": round(avg_growth_rate, 4),
+        "predicted_completion_date": predicted_completion_date,
+        "completion_probability": probability,
+        "data_points": len(timestamps),
+        "base_datetime": base_dt,
+        "timestamps": timestamps,
+        "completions": completions,
+        "x_hours": x_hours
+    }
+
+
+def generate_prediction_line(prediction, num_points=20):
+    if prediction is None:
+        return [], []
+    base_dt = prediction["base_datetime"]
+    x_hours = prediction["x_hours"]
+    slope = prediction["slope"]
+    intercept = prediction["intercept"]
+
+    pred_x = []
+    pred_y = []
+
+    if slope > 0:
+        hours_to_100 = (100 - intercept) / slope
+        if hours_to_100 > 0:
+            max_hours = max(max(x_hours) if x_hours else 0, hours_to_100)
+        else:
+            max_hours = max(x_hours) if x_hours else 0
+    else:
+        max_hours = max(x_hours) if x_hours else 0
+        max_hours = max_hours * 1.5
+
+    min_hours = min(x_hours) if x_hours else 0
+    step = (max_hours - min_hours) / max(1, num_points - 1)
+
+    from datetime import timedelta
+    for i in range(num_points):
+        h = min_hours + i * step
+        y = slope * h + intercept
+        y = max(0, min(100, y))
+        dt = base_dt + timedelta(hours=h)
+        pred_x.append(dt.strftime("%Y-%m-%d %H:%M:%S"))
+        pred_y.append(round(y, 2))
+
+    return pred_x, pred_y
+
+
+def create_prediction_info_panel(predictions):
+    if not predictions:
+        return html.Div("选择目标后将显示预测信息", className="prediction-info-empty")
+
+    items = []
+    for pred in predictions:
+        if pred is None:
+            continue
+        target_name = pred["target_name"]
+        prob = pred["completion_probability"]
+        avg_growth = pred["avg_growth_rate"]
+        pred_date = pred["predicted_completion_date"]
+        data_pts = pred["data_points"]
+        r2 = pred["r_squared"]
+
+        if prob >= 80:
+            prob_color = "#00C853"
+        elif prob >= 50:
+            prob_color = "#FFB300"
+        else:
+            prob_color = "#FF5252"
+
+        pred_date_text = pred_date if pred_date else "无法预测（增长趋势不明显）"
+
+        items.append(
+            html.Div([
+                html.Div([
+                    html.Span(f"🎯 {target_name}", className="prediction-target-name"),
+                    html.Span(
+                        f"{prob}%",
+                        className="prediction-probability",
+                        style={"color": prob_color}
+                    )
+                ], className="prediction-header-row"),
+                html.Div([
+                    html.Div([
+                        html.Span("预计完成日期：", className="prediction-label"),
+                        html.Span(pred_date_text, className="prediction-value prediction-date")
+                    ], className="prediction-row"),
+                    html.Div([
+                        html.Span("日均增长速度：", className="prediction-label"),
+                        html.Span(f"{avg_growth:.4f}%/天", className="prediction-value")
+                    ], className="prediction-row"),
+                    html.Div([
+                        html.Span("数据点数：", className="prediction-label"),
+                        html.Span(f"{data_pts} 个快照", className="prediction-value")
+                    ], className="prediction-row"),
+                    html.Div([
+                        html.Span("拟合优度 R²：", className="prediction-label"),
+                        html.Span(f"{r2:.4f}" if r2 is not None else "N/A", className="prediction-value")
+                    ], className="prediction-row")
+                ], className="prediction-details")
+            ], className="prediction-item")
+        )
+
+    return html.Div(items, className="prediction-info-list")
+
+
+def create_trend_chart(selected_targets, history, targets_data=None):
     fig = go.Figure()
     colors = ["#667eea", "#764ba2", "#00C853", "#FFB300", "#FF5252", "#00BCD4"]
+    pred_colors = ["#a8b3f5", "#b39dcc", "#7fefb5", "#ffd699", "#ffb3b3", "#9fe8ef"]
 
     if not selected_targets:
         fig.add_annotation(
@@ -245,6 +460,7 @@ def create_trend_chart(selected_targets, history):
 
         if timestamps:
             color = colors[idx % len(colors)]
+            pred_color = pred_colors[idx % len(pred_colors)]
             fig.add_trace(go.Scatter(
                 x=timestamps,
                 y=completions,
@@ -256,6 +472,55 @@ def create_trend_chart(selected_targets, history):
                               "时间：%{x}<br>" +
                               "完成率：%{y}%<extra></extra>"
             ))
+
+            prediction = predict_target_completion(target_name, history, targets_data)
+            if prediction is not None:
+                pred_x, pred_y = generate_prediction_line(prediction)
+                if pred_x and pred_y:
+                    fig.add_trace(go.Scatter(
+                        x=pred_x,
+                        y=pred_y,
+                        mode="lines",
+                        name=f"{target_name} (预测)",
+                        line=dict(color=pred_color, width=2, dash="dash"),
+                        hovertemplate=f"<b>{target_name} (预测)</b><br>" +
+                                      "时间：%{x}<br>" +
+                                      "预测完成率：%{y}%<extra></extra>"
+                    ))
+
+                    if prediction["predicted_completion_date"]:
+                        fig.add_annotation(
+                            x=prediction["predicted_completion_date"],
+                            y=100,
+                            text=f"🎯 {target_name}<br>预计完成",
+                            showarrow=True,
+                            arrowhead=2,
+                            arrowsize=1,
+                            arrowwidth=2,
+                            arrowcolor=pred_color,
+                            ax=0,
+                            ay=-40,
+                            font=dict(size=10, color=color),
+                            bgcolor="white",
+                            bordercolor=pred_color,
+                            borderwidth=1,
+                            borderpad=4
+                        )
+
+    fig.add_shape(
+        type="line",
+        x0=0,
+        x1=1,
+        xref="paper",
+        y0=100,
+        y1=100,
+        yref="y",
+        line=dict(
+            color="#333",
+            width=1,
+            dash="dot"
+        )
+    )
 
     fig.update_layout(
         height=450,
@@ -1141,7 +1406,15 @@ app.layout = html.Div([
                         figure=create_trend_chart([], load_history()),
                         config={'displayModeBar': True, 'displaylogo': False},
                         className="trend-chart-container"
-                    )
+                    ),
+                    html.Div([
+                        html.H3("🔮 完成率预测", className="prediction-section-title"),
+                        html.Div(
+                            id="prediction-info-container",
+                            children=create_prediction_info_panel([]),
+                            className="prediction-info-panel"
+                        )
+                    ], className="prediction-section")
                 ], className="trend-section"),
 
                 html.Div([
@@ -1606,7 +1879,8 @@ def handle_data_updates(contents, close_clicks, targets_data, filename, alert_co
      Output("save-status", "children"),
      Output("trend-chart", "figure"),
      Output("snapshot-count", "children"),
-     Output("target-selector", "options")],
+     Output("target-selector", "options"),
+     Output("prediction-info-container", "children")],
     [Input("save-snapshot-btn", "n_clicks"),
      Input("target-selector", "value"),
      Input("targets-store", "data")],
@@ -1621,14 +1895,18 @@ def handle_trend_updates(n_clicks, selected_targets, current_targets, current_hi
     if not ctx.triggered:
         history = current_history or []
         count_text = f"已保存 {len(history)} 个历史快照"
-        return history, "", create_trend_chart(selected_targets or [], history), count_text, options
+        sel = selected_targets or []
+        predictions = [predict_target_completion(t, history, targets) for t in sel]
+        return history, "", create_trend_chart(sel, history, targets), count_text, options, create_prediction_info_panel(predictions)
 
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
     if trigger_id == "targets-store":
         history = current_history or []
         count_text = f"已保存 {len(history)} 个历史快照"
-        return history, "", create_trend_chart(selected_targets or [], history), count_text, options
+        sel = selected_targets or []
+        predictions = [predict_target_completion(t, history, targets) for t in sel]
+        return history, "", create_trend_chart(sel, history, targets), count_text, options, create_prediction_info_panel(predictions)
 
     if trigger_id == "save-snapshot-btn" and n_clicks and n_clicks > 0:
         history = save_snapshot(targets)
@@ -1641,9 +1919,11 @@ def handle_trend_updates(n_clicks, selected_targets, current_targets, current_hi
         status = ""
 
     count_text = f"已保存 {len(history)} 个历史快照"
-    fig = create_trend_chart(selected_targets or [], history)
+    sel = selected_targets or []
+    fig = create_trend_chart(sel, history, targets)
+    predictions = [predict_target_completion(t, history, targets) for t in sel]
 
-    return history, status, fig, count_text, options
+    return history, status, fig, count_text, options, create_prediction_info_panel(predictions)
 
 
 @app.callback(

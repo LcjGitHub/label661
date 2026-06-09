@@ -46,6 +46,23 @@ def init_db():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS target_predictions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            target_id INTEGER NOT NULL,
+            target_name TEXT NOT NULL,
+            slope REAL NOT NULL,
+            intercept REAL NOT NULL,
+            avg_growth_rate REAL NOT NULL,
+            predicted_completion_date TEXT,
+            completion_probability REAL NOT NULL,
+            data_points INTEGER NOT NULL,
+            r_squared REAL,
+            predicted_at TEXT NOT NULL,
+            FOREIGN KEY (target_id) REFERENCES targets (id)
+        )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -273,6 +290,92 @@ def seed_default_public_data():
         )
     conn.commit()
     conn.close()
+
+
+def save_prediction(target_id, target_name, slope, intercept, avg_growth_rate,
+                    predicted_completion_date, completion_probability, data_points, r_squared=None):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """INSERT INTO target_predictions
+           (target_id, target_name, slope, intercept, avg_growth_rate,
+            predicted_completion_date, completion_probability, data_points, r_squared, predicted_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (target_id, target_name, slope, intercept, avg_growth_rate,
+         predicted_completion_date, completion_probability, data_points, r_squared, now)
+    )
+    conn.commit()
+    prediction_id = cursor.lastrowid
+    conn.close()
+    return get_prediction_by_id(prediction_id)
+
+
+def get_prediction_by_id(prediction_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM target_predictions WHERE id = ?", (prediction_id,))
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return row_to_prediction_dict(row)
+    return None
+
+
+def row_to_prediction_dict(row):
+    return {
+        "id": row["id"],
+        "target_id": row["target_id"],
+        "target_name": row["target_name"],
+        "slope": row["slope"],
+        "intercept": row["intercept"],
+        "avg_growth_rate": row["avg_growth_rate"],
+        "predicted_completion_date": row["predicted_completion_date"],
+        "completion_probability": row["completion_probability"],
+        "data_points": row["data_points"],
+        "r_squared": row["r_squared"],
+        "predicted_at": row["predicted_at"]
+    }
+
+
+def get_latest_prediction_by_target(target_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM target_predictions WHERE target_id = ? ORDER BY predicted_at DESC LIMIT 1",
+        (target_id,)
+    )
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return row_to_prediction_dict(row)
+    return None
+
+
+def get_latest_prediction_by_target_name(target_name):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM target_predictions WHERE target_name = ? ORDER BY predicted_at DESC LIMIT 1",
+        (target_name,)
+    )
+    row = cursor.fetchone()
+    conn.close()
+    if row:
+        return row_to_prediction_dict(row)
+    return None
+
+
+def get_all_predictions_by_target(target_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM target_predictions WHERE target_id = ? ORDER BY predicted_at DESC",
+        (target_id,)
+    )
+    rows = cursor.fetchall()
+    conn.close()
+    return [row_to_prediction_dict(r) for r in rows]
 
 
 init_db()
