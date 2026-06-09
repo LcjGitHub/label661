@@ -2454,14 +2454,15 @@ body {
 
 .ranking-section-wrapper {
     margin-top: 30px;
-}
-
-.ranking-section {
     background: linear-gradient(135deg, #fffbeb 0%, #fff8e1 100%);
     border-radius: 20px;
     padding: 28px;
     border: 1px solid #ffe082;
     box-shadow: 0 4px 20px rgba(255, 193, 7, 0.1);
+}
+
+.ranking-section-body {
+    display: block;
 }
 
 .ranking-header {

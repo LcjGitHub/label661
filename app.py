@@ -442,48 +442,91 @@ def create_prediction_info_panel(predictions):
     return html.Div(items, className="prediction-info-list")
 
 
-def calculate_target_progress(target_name, history, time_range="all"):
+def calculate_target_progress(target_name, history, current_completion, target_created_at=None):
     from datetime import datetime as dt
-    timestamps = []
-    completions = []
+    created_dt = None
+    if target_created_at:
+        try:
+            created_dt = dt.strptime(target_created_at, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            created_dt = None
 
-    start_time = None
-    if time_range == "week":
-        now = dt.now()
-        start_time = now - timedelta(days=now.weekday())
-        start_time = start_time.replace(hour=0, minute=0, second=0, microsecond=0)
-    elif time_range == "month":
-        now = dt.now()
-        start_time = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    earliest_completion = None
+    earliest_timestamp = None
 
     for snapshot in history:
         try:
             snap_dt = dt.strptime(snapshot["timestamp"], "%Y-%m-%d %H:%M:%S")
         except ValueError:
             continue
-        if start_time and snap_dt < start_time:
+        if created_dt is not None and snap_dt < created_dt:
             continue
         for target in snapshot["targets"]:
             if target["name"] == target_name:
-                timestamps.append(snapshot["timestamp"])
-                completions.append(target["completion"])
+                if earliest_timestamp is None or snap_dt < earliest_timestamp:
+                    earliest_timestamp = snap_dt
+                    earliest_completion = target["completion"]
                 break
 
-    if len(completions) >= 2:
-        initial = completions[0]
-        current = completions[-1]
-        return round(current - initial, 2), initial, current
-    elif len(completions) == 1:
-        return 0.0, completions[0], completions[0]
-    return 0.0, None, None
+    if earliest_completion is not None:
+        progress = round(current_completion - earliest_completion, 2)
+        return progress, earliest_completion, current_completion
+    return 0.0, current_completion, current_completion
 
 
-def get_completion_top5(targets_data, history, time_range="all"):
+def _get_ranking_time_range_start(time_range):
+    from datetime import datetime as dt
+    now = dt.now()
+    if time_range == "week":
+        start = now - timedelta(days=now.weekday())
+        return start.replace(hour=0, minute=0, second=0, microsecond=0)
+    elif time_range == "month":
+        start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        return start
+    return None
+
+
+def filter_targets_by_time_range(targets_data, history, time_range="all"):
+    from datetime import datetime as dt
+    if time_range == "all":
+        return targets_data
+
+    start_time = _get_ranking_time_range_start(time_range)
+    if start_time is None:
+        return targets_data
+
+    target_names_in_range = set()
+    for snapshot in history:
+        try:
+            snap_dt = dt.strptime(snapshot["timestamp"], "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            continue
+        if snap_dt >= start_time:
+            for target in snapshot["targets"]:
+                target_names_in_range.add(target["name"])
+
+    filtered = []
+    for item in targets_data:
+        try:
+            created_dt = dt.strptime(item["created_at"], "%Y-%m-%d %H:%M:%S")
+        except (ValueError, KeyError):
+            created_dt = None
+        created_in_range = created_dt is not None and created_dt >= start_time
+        has_snapshot_in_range = item["name"] in target_names_in_range
+        if created_in_range or has_snapshot_in_range:
+            filtered.append(item)
+    return filtered
+
+
+def get_completion_top5(targets_data, history):
     ranked = sorted(targets_data, key=lambda x: x["completion"], reverse=True)
     top5 = ranked[:5]
     result = []
     for idx, item in enumerate(top5):
-        progress, initial, current = calculate_target_progress(item["name"], history, time_range)
+        progress, initial, current = calculate_target_progress(
+            item["name"], history, item["completion"],
+            target_created_at=item.get("created_at")
+        )
         result.append({
             **item,
             "rank": idx + 1,
@@ -493,10 +536,13 @@ def get_completion_top5(targets_data, history, time_range="all"):
     return result
 
 
-def get_progress_top5(targets_data, history, time_range="all"):
+def get_progress_top5(targets_data, history):
     targets_with_progress = []
     for item in targets_data:
-        progress, initial, current = calculate_target_progress(item["name"], history, time_range)
+        progress, initial, current = calculate_target_progress(
+            item["name"], history, item["completion"],
+            target_created_at=item.get("created_at")
+        )
         targets_with_progress.append({
             **item,
             "progress": progress,
@@ -575,14 +621,7 @@ def create_ranking_item(item, show_progress=False):
     ], className="ranking-item")
 
 
-def create_ranking_section(completion_top5, progress_top5, time_range="all"):
-    time_labels = {
-        "week": "本周",
-        "month": "本月",
-        "all": "全部时间"
-    }
-    current_label = time_labels.get(time_range, "全部时间")
-
+def create_ranking_section(completion_top5, progress_top5):
     completion_items = [create_ranking_item(item, show_progress=False) for item in completion_top5] if completion_top5 else [
         html.Div("暂无数据", className="ranking-empty")
     ]
@@ -591,23 +630,6 @@ def create_ranking_section(completion_top5, progress_top5, time_range="all"):
     ]
 
     return html.Div([
-        html.Div([
-            html.H2("🏆 目标排行榜", className="section-title ranking-section-title"),
-            html.Div([
-                html.Span("时间范围：", className="ranking-time-label"),
-                dcc.Dropdown(
-                    id="ranking-time-range",
-                    options=[
-                        {"label": "本周", "value": "week"},
-                        {"label": "本月", "value": "month"},
-                        {"label": "全部时间", "value": "all"}
-                    ],
-                    value=time_range,
-                    clearable=False,
-                    className="ranking-time-dropdown"
-                )
-            ], className="ranking-time-selector")
-        ], className="ranking-header"),
         html.Div([
             html.Div([
                 html.H3("🥇 完成率 TOP5", className="ranking-subtitle ranking-completion-title"),
@@ -618,7 +640,7 @@ def create_ranking_section(completion_top5, progress_top5, time_range="all"):
                 html.Div(progress_items, className="ranking-list")
             ], className="ranking-column ranking-progress-column")
         ], className="ranking-columns")
-    ], className="ranking-section")
+    ], className="ranking-section-body")
 
 
 def create_trend_chart(selected_targets, history, targets_data=None):
@@ -1628,7 +1650,27 @@ app.layout = html.Div([
 
                 html.Div(
                     id="ranking-container",
-                    className="ranking-section-wrapper"
+                    className="ranking-section-wrapper",
+                    children=[
+                        html.Div([
+                            html.H2("🏆 目标排行榜", className="section-title ranking-section-title"),
+                            html.Div([
+                                html.Span("时间范围：", className="ranking-time-label"),
+                                dcc.Dropdown(
+                                    id="ranking-time-range",
+                                    options=[
+                                        {"label": "本周", "value": "week"},
+                                        {"label": "本月", "value": "month"},
+                                        {"label": "全部时间", "value": "all"}
+                                    ],
+                                    value="all",
+                                    clearable=False,
+                                    className="ranking-time-dropdown"
+                                )
+                            ], className="ranking-time-selector")
+                        ], className="ranking-header"),
+                        html.Div(id="ranking-content", className="ranking-content")
+                    ]
                 ),
 
                 html.Div([
@@ -2141,20 +2183,8 @@ def handle_trend_updates(n_clicks, selected_targets, current_targets, current_hi
 
 
 @app.callback(
-    Output("ranking-time-range-store", "data"),
-    [Input("ranking-time-range", "value")],
-    [State("ranking-time-range-store", "data")],
-    prevent_initial_call=False
-)
-def handle_ranking_time_range(new_value, current_value):
-    if new_value is None:
-        return current_value or "all"
-    return new_value
-
-
-@app.callback(
-    Output("ranking-container", "children"),
-    [Input("ranking-time-range-store", "data"),
+    Output("ranking-content", "children"),
+    [Input("ranking-time-range", "value"),
      Input("targets-store", "data"),
      Input("history-store", "data"),
      Input("user-store", "data")],
@@ -2164,13 +2194,14 @@ def render_ranking_section(time_range, targets_data, history_data, user_data):
     time_range = time_range or "all"
     user_id = user_data["user_id"] if user_data else None
     history = history_data or load_history()
-    targets = targets_data or get_ranking_targets(time_range, user_id)
 
-    ranking_targets = get_ranking_targets(time_range, user_id)
-    completion_top5 = get_completion_top5(ranking_targets, history, time_range)
-    progress_top5 = get_progress_top5(ranking_targets, history, time_range)
+    all_targets = get_ranking_targets(user_id)
+    filtered_targets = filter_targets_by_time_range(all_targets, history, time_range)
 
-    return create_ranking_section(completion_top5, progress_top5, time_range)
+    completion_top5 = get_completion_top5(filtered_targets, history)
+    progress_top5 = get_progress_top5(filtered_targets, history)
+
+    return create_ranking_section(completion_top5, progress_top5)
 
 
 @app.callback(

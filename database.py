@@ -420,8 +420,7 @@ def _row_to_ranking_dict(row):
     }
 
 
-def get_ranking_targets(time_range="all", user_id=None):
-    start_time = _get_time_range_start(time_range)
+def get_ranking_targets(user_id=None):
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -432,10 +431,6 @@ def get_ranking_targets(time_range="all", user_id=None):
         WHERE 1=1
     """
     params = []
-
-    if start_time:
-        base_query += " AND t.updated_at >= ?"
-        params.append(start_time)
 
     if user_id is not None:
         base_query += " AND (t.user_id = ? OR t.is_public = 1)"
