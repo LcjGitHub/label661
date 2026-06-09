@@ -1,9 +1,12 @@
 import dash
-from dash import html, dcc, Input, Output, State, callback_context
+from dash import html, dcc, Input, Output, State, callback_context, no_update, ALL
 import plotly.graph_objects as go
 from datetime import datetime
 import json
 import os
+import io
+import base64
+import pandas as pd
 
 from alert_module import (
     ALERT_LEVELS,
@@ -19,7 +22,7 @@ from alert_module import (
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 app.title = "目标完成进度监控"
 
-mock_data = [
+initial_mock_data = [
     {"name": "年度销售目标", "completion": 78, "target": 1000000, "current": 780000, "unit": "元"},
     {"name": "客户增长", "completion": 92, "target": 500, "current": 460, "unit": "个"},
     {"name": "产品上线", "completion": 65, "target": 12, "current": 8, "unit": "个"},
@@ -28,7 +31,130 @@ mock_data = [
     {"name": "市场份额", "completion": 72, "target": 25, "current": 18, "unit": "%"},
 ]
 
+EXPECTED_COLUMNS = ["目标名称", "当前值", "目标值", "完成率", "单位"]
+EXPECTED_COLUMNS_EN = ["name", "current", "target", "completion", "unit"]
+
 HISTORY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "history_snapshots.json")
+
+
+def export_data_to_file(data, file_format="csv"):
+    export_list = []
+    for item in data:
+        export_list.append({
+            "目标名称": item["name"],
+            "当前值": item["current"],
+            "目标值": item["target"],
+            "完成率": item["completion"],
+            "单位": item["unit"]
+        })
+    df = pd.DataFrame(export_list, columns=EXPECTED_COLUMNS)
+
+    buffer = io.BytesIO()
+    if file_format == "xlsx":
+        with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False, sheet_name="目标数据")
+        buffer.seek(0)
+        filename = f"目标数据_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    else:
+        csv_str = df.to_csv(index=False, encoding="utf-8-sig")
+        buffer.write(csv_str.encode("utf-8-sig"))
+        buffer.seek(0)
+        filename = f"目标数据_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        mime = "text/csv"
+
+    b64 = base64.b64encode(buffer.read()).decode("utf-8")
+    return dict(content=b64, filename=filename, mime_type=mime, base64=True)
+
+
+def parse_uploaded_file(contents, filename):
+    if contents is None:
+        return None, "未选择文件"
+
+    try:
+        content_type, content_string = contents.split(",")
+        decoded = base64.b64decode(content_string)
+    except Exception:
+        return None, "文件内容解析失败"
+
+    try:
+        if filename.endswith(".csv"):
+            df = pd.read_csv(io.StringIO(decoded.decode("utf-8-sig")))
+        elif filename.endswith((".xlsx", ".xls")):
+            df = pd.read_excel(io.BytesIO(decoded))
+        else:
+            return None, "不支持的文件格式，请上传 .csv 或 .xlsx 文件"
+    except Exception as e:
+        return None, f"文件读取失败：{str(e)}"
+
+    cols = [c.strip() for c in df.columns.tolist()]
+    has_zh = all(c in cols for c in EXPECTED_COLUMNS)
+    has_en = all(c in cols for c in EXPECTED_COLUMNS_EN)
+
+    if not has_zh and not has_en:
+        return None, (f"数据格式错误！文件必须包含以下列：{', '.join(EXPECTED_COLUMNS)} "
+                      f"或 {', '.join(EXPECTED_COLUMNS_EN)}。当前列：{', '.join(cols)}")
+
+    col_map = dict(zip(EXPECTED_COLUMNS, EXPECTED_COLUMNS_EN)) if has_zh else dict(zip(EXPECTED_COLUMNS_EN, EXPECTED_COLUMNS_EN))
+    df.columns = [col_map.get(c.strip(), c.strip()) for c in df.columns]
+
+    parsed_data = []
+    errors = []
+    for idx, row in df.iterrows():
+        row_num = idx + 2
+        try:
+            name = str(row["name"]).strip()
+            if not name or name.lower() == "nan":
+                errors.append(f"第 {row_num} 行：目标名称为空")
+                continue
+
+            try:
+                current = float(row["current"])
+            except (ValueError, TypeError):
+                errors.append(f"第 {row_num} 行：当前值不是有效数字")
+                continue
+
+            try:
+                target = float(row["target"])
+            except (ValueError, TypeError):
+                errors.append(f"第 {row_num} 行：目标值不是有效数字")
+                continue
+
+            try:
+                completion = float(row["completion"])
+                if completion < 0 or completion > 100:
+                    errors.append(f"第 {row_num} 行：完成率应在 0-100 之间")
+                    continue
+            except (ValueError, TypeError):
+                errors.append(f"第 {row_num} 行：完成率不是有效数字")
+                continue
+
+            unit = str(row["unit"]).strip() if pd.notna(row["unit"]) else ""
+            if unit.lower() == "nan":
+                unit = ""
+
+            if target > 0:
+                calc_completion = round(current / target * 100, 2)
+            else:
+                calc_completion = 0.0
+
+            parsed_data.append({
+                "name": name,
+                "current": current,
+                "target": target,
+                "completion": calc_completion,
+                "unit": unit
+            })
+        except Exception as e:
+            errors.append(f"第 {row_num} 行：解析错误 - {str(e)}")
+
+    if errors:
+        return None, "\n".join(errors)
+
+    if not parsed_data:
+        return None, "文件中没有有效的数据行"
+
+    return parsed_data, None
 
 
 def load_history():
@@ -53,8 +179,10 @@ def save_snapshot(data):
     return history
 
 
-def get_target_names():
-    return [item["name"] for item in mock_data]
+def get_target_names(data=None):
+    if data is None:
+        data = initial_mock_data
+    return [item["name"] for item in data]
 
 
 def create_trend_chart(selected_targets, history):
@@ -398,31 +526,122 @@ def create_alert_config_panel(alert_config):
 
 initial_alert_config = load_alert_config()
 initial_triggered, initial_alert_logs = detect_and_log_alerts(
-    mock_data, initial_alert_config, prev_triggered_names=None, is_initial_load=True
+    initial_mock_data, initial_alert_config, prev_triggered_names=None, is_initial_load=True
 )
 
 
+def create_alert_config_panel(alert_config, data=None):
+    config_rows = []
+    for target_name in get_target_names(data):
+        config = alert_config.get(target_name, DEFAULT_ALERT_CONFIG.get(target_name, {"threshold": 70, "level": "medium"}))
+        config_rows.append(
+            html.Div([
+                html.Div(target_name, className="alert-config-name"),
+                html.Div([
+                    html.Label("预警阈值 (%):", className="alert-config-label"),
+                    dcc.Input(
+                        id={"type": "threshold-input", "index": target_name},
+                        type="number",
+                        min=0,
+                        max=100,
+                        value=config["threshold"],
+                        className="alert-config-threshold-input"
+                    )
+                ], className="alert-config-field"),
+                html.Div([
+                    html.Label("预警级别:", className="alert-config-label"),
+                    dcc.Dropdown(
+                        id={"type": "level-dropdown", "index": target_name},
+                        options=[
+                            {"label": "低预警", "value": "low"},
+                            {"label": "中预警", "value": "medium"},
+                            {"label": "高预警", "value": "high"}
+                        ],
+                        value=config["level"],
+                        clearable=False,
+                        className="alert-config-level-dropdown"
+                    )
+                ], className="alert-config-field")
+            ], className="alert-config-row")
+        )
+
+    return html.Div([
+        html.Div("⚙️ 预警配置", className="alert-config-title"),
+        html.Div("为每个目标设置独立的预警阈值和级别", className="alert-config-subtitle"),
+        html.Div(config_rows, className="alert-config-list"),
+        html.Button(
+            "💾 保存预警配置",
+            id="save-alert-config-btn",
+            className="save-alert-config-btn",
+            n_clicks=0
+        ),
+        html.Div(id="alert-config-status", className="alert-config-status")
+    ], className="alert-config-panel")
+
+
 app.layout = html.Div([
+    dcc.Store(id="targets-store", data=initial_mock_data),
     dcc.Store(id="history-store", data=load_history()),
     dcc.Store(id="alert-config-store", data=initial_alert_config),
     dcc.Store(id="alert-logs-store", data=initial_alert_logs),
     dcc.Store(id="triggered-alerts-store", data=initial_triggered),
     dcc.Store(id="is-first-load", data=True),
+    dcc.Download(id="download-data"),
     dcc.Interval(id="alert-interval", interval=30000, n_intervals=0),
 
     html.Div([
         html.H1("🎯 目标完成进度监控", className="page-title"),
         html.Div(
-            f"数据更新时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            id="update-time-text",
+            children=f"数据更新时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
             className="update-time"
         ),
+        html.Div([
+            html.Div([
+                html.Button(
+                    [html.Span("📥", className="btn-icon"), " 导出 Excel"],
+                    id="export-excel-btn",
+                    className="io-btn io-btn-excel",
+                    n_clicks=0
+                ),
+                html.Button(
+                    [html.Span("📄", className="btn-icon"), " 导出 CSV"],
+                    id="export-csv-btn",
+                    className="io-btn io-btn-csv",
+                    n_clicks=0
+                ),
+                html.Button(
+                    [html.Span("�", className="btn-icon"), " 导入数据"],
+                    id="import-btn",
+                    className="io-btn io-btn-import",
+                    n_clicks=0
+                ),
+            ], className="io-buttons-group"),
+            dcc.Upload(
+                id="upload-data",
+                children=[],
+                multiple=False,
+                accept=".csv,.xlsx,.xls",
+                className="upload-hidden"
+            ),
+        ], className="io-buttons-container"),
         html.Button(
-            [html.Span("📸", className="btn-icon"), " 保存当前快照"],
+            [html.Span("�", className="btn-icon"), " 保存当前快照"],
             id="save-snapshot-btn",
             className="save-snapshot-btn",
             n_clicks=0
         ),
-        html.Div(id="save-status", className="save-status")
+        html.Div(id="save-status", className="save-status"),
+        html.Div(id="io-status", className="io-status"),
+        html.Div(id="error-modal-container", className="error-modal-overlay hidden", children=[
+            html.Div(className="error-modal", children=[
+                html.Div(className="error-modal-header", children=[
+                    html.Span("⚠️ 数据导入错误", className="error-modal-title"),
+                    html.Button("×", id="error-modal-close", className="error-modal-close-btn")
+                ]),
+                html.Div(id="error-modal-body", className="error-modal-body", children="")
+            ])
+        ]),
     ], className="header"),
 
     html.Div(id="alert-banner-container", children=create_alert_banner(initial_triggered)),
@@ -430,24 +649,11 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.Div([
-                html.Div([
-                    html.Div([
-                        dcc.Graph(
-                            id=f"gauge-{idx}",
-                            figure=create_gauge_chart(data, initial_alert_config),
-                            config={'displayModeBar': False},
-                            className="gauge-chart"
-                        )
-                    ], className=f"chart-container{' alert-chart-container' if data['name'] in initial_alert_config and data['completion'] < initial_alert_config[data['name']]['threshold'] else ''}")
-                    for idx, data in enumerate(mock_data)
-                ], className="charts-grid"),
+                html.Div(id="gauges-container", className="charts-grid"),
 
                 html.Div([
                     html.H2("详细数据统计", className="section-title"),
-                    html.Div(id="stats-container", children=[
-                        create_stats_card(data, initial_alert_config)
-                        for data in mock_data
-                    ], className="stats-grid")
+                    html.Div(id="stats-container", className="stats-grid")
                 ], className="stats-section"),
 
                 html.Div([
@@ -481,7 +687,7 @@ app.layout = html.Div([
 
                 html.Div([
                     html.H2("⚙️ 预警阈值配置", className="section-title"),
-                    html.Div(id="alert-config-container", children=create_alert_config_panel(initial_alert_config))
+                    html.Div(id="alert-config-container", children=create_alert_config_panel(initial_alert_config, initial_mock_data))
                 ], className="alert-config-section")
             ], className="main-content"),
 
@@ -499,27 +705,133 @@ app.layout = html.Div([
 
 
 @app.callback(
+    Output("download-data", "data"),
+    [Input("export-excel-btn", "n_clicks"),
+     Input("export-csv-btn", "n_clicks")],
+    [State("targets-store", "data")],
+    prevent_initial_call=True
+)
+def handle_export(n_excel, n_csv, current_data):
+    ctx = callback_context
+    if not ctx.triggered:
+        return no_update
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    data = current_data or initial_mock_data
+    if trigger_id == "export-excel-btn":
+        return export_data_to_file(data, "xlsx")
+    elif trigger_id == "export-csv-btn":
+        return export_data_to_file(data, "csv")
+    return no_update
+
+
+app.clientside_callback(
+    """
+    function(n_clicks) {
+        if (n_clicks > 0) {
+            var uploadInput = document.querySelector('#upload-data input[type="file"]');
+            if (uploadInput) {
+                uploadInput.click();
+            }
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("upload-data", "contents"),
+    [Input("import-btn", "n_clicks")],
+    prevent_initial_call=True
+)
+
+
+@app.callback(
+    [Output("targets-store", "data"),
+     Output("io-status", "children"),
+     Output("error-modal-container", "className"),
+     Output("error-modal-body", "children"),
+     Output("update-time-text", "children"),
+     Output("alert-config-container", "children")],
+    [Input("upload-data", "contents"),
+     Input("error-modal-close", "n_clicks")],
+    [State("upload-data", "filename"),
+     State("targets-store", "data"),
+     State("alert-config-store", "data")],
+    prevent_initial_call=False
+)
+def handle_import(contents, close_clicks, filename, current_data, alert_config):
+    ctx = callback_context
+
+    if not ctx.triggered:
+        config = alert_config or load_alert_config()
+        return (
+            initial_mock_data,
+            "",
+            "error-modal-overlay hidden",
+            "",
+            f"数据更新时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            create_alert_config_panel(config, initial_mock_data)
+        )
+
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if trigger_id == "error-modal-close":
+        return no_update, "", "error-modal-overlay hidden", "", no_update, no_update
+
+    if trigger_id == "upload-data" and contents is not None:
+        parsed, error = parse_uploaded_file(contents, filename)
+        if error:
+            error_children = [
+                html.Div("导入失败，具体错误如下：", className="error-modal-intro"),
+                html.Pre(error, className="error-modal-detail")
+            ]
+            return no_update, "", "error-modal-overlay", error_children, no_update, no_update
+
+        config = alert_config or load_alert_config()
+        success = html.Div([
+            html.Span("✅", className="status-icon"),
+            f" 成功导入 {len(parsed)} 条目标数据！"
+        ], className="io-success")
+        return (
+            parsed,
+            success,
+            "error-modal-overlay hidden",
+            "",
+            f"数据更新时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            create_alert_config_panel(config, parsed)
+        )
+
+    return no_update, "", "error-modal-overlay hidden", "", no_update, no_update
+
+
+@app.callback(
     [Output("history-store", "data"),
      Output("save-status", "children"),
      Output("trend-chart", "figure"),
-     Output("snapshot-count", "children")],
+     Output("snapshot-count", "children"),
+     Output("target-selector", "options")],
     [Input("save-snapshot-btn", "n_clicks"),
-     Input("target-selector", "value")],
+     Input("target-selector", "value"),
+     Input("targets-store", "data")],
     [State("history-store", "data")],
     prevent_initial_call=False
 )
-def handle_trend_updates(n_clicks, selected_targets, current_history):
+def handle_trend_updates(n_clicks, selected_targets, current_targets, current_history):
     ctx = callback_context
+    targets = current_targets or initial_mock_data
+    options = [{"label": name, "value": name} for name in get_target_names(targets)]
 
     if not ctx.triggered:
         history = current_history or []
         count_text = f"已保存 {len(history)} 个历史快照"
-        return history, "", create_trend_chart(selected_targets or [], history), count_text
+        return history, "", create_trend_chart(selected_targets or [], history), count_text, options
 
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-    if trigger_id == "save-snapshot-btn" and n_clicks > 0:
-        history = save_snapshot(mock_data)
+    if trigger_id == "targets-store":
+        history = current_history or []
+        count_text = f"已保存 {len(history)} 个历史快照"
+        return history, "", create_trend_chart(selected_targets or [], history), count_text, options
+
+    if trigger_id == "save-snapshot-btn" and n_clicks and n_clicks > 0:
+        history = save_snapshot(targets)
         status = html.Div([
             html.Span("✅", className="status-icon"),
             f" 快照已保存成功！当前共 {len(history)} 个历史记录"
@@ -531,49 +843,7 @@ def handle_trend_updates(n_clicks, selected_targets, current_history):
     count_text = f"已保存 {len(history)} 个历史快照"
     fig = create_trend_chart(selected_targets or [], history)
 
-    return history, status, fig, count_text
-
-
-def get_alert_config_inputs():
-    inputs = []
-    for name in get_target_names():
-        inputs.append(State(f"threshold-{name}", "value"))
-        inputs.append(State(f"level-{name}", "value"))
-    return inputs
-
-
-@app.callback(
-    [Output("alert-config-store", "data"),
-     Output("alert-config-status", "children")],
-    [Input("save-alert-config-btn", "n_clicks")],
-    get_alert_config_inputs(),
-    prevent_initial_call=False
-)
-def handle_alert_config_save(n_clicks, *args):
-    if not n_clicks or n_clicks == 0:
-        return load_alert_config(), ""
-
-    new_config = {}
-    target_names = get_target_names()
-    for i, name in enumerate(target_names):
-        threshold = args[i * 2]
-        level = args[i * 2 + 1]
-        if threshold is None:
-            threshold = DEFAULT_ALERT_CONFIG.get(name, {"threshold": 70})["threshold"]
-        if level is None:
-            level = DEFAULT_ALERT_CONFIG.get(name, {"level": "medium"})["level"]
-        new_config[name] = {
-            "threshold": int(threshold),
-            "level": level
-        }
-
-    save_alert_config(new_config)
-    status = html.Div([
-        html.Span("✅", className="status-icon"),
-        " 预警配置已保存成功！"
-    ], className="config-save-success")
-
-    return new_config, status
+    return history, status, fig, count_text, options
 
 
 @app.callback(
@@ -581,39 +851,61 @@ def handle_alert_config_save(n_clicks, *args):
      Output("alert-logs-store", "data"),
      Output("triggered-alerts-store", "data"),
      Output("stats-container", "children"),
-     Output("is-first-load", "data")] +
-    [Output(f"gauge-{idx}", "figure") for idx in range(len(mock_data))],
+     Output("gauges-container", "children"),
+     Output("is-first-load", "data")],
     [Input("alert-config-store", "data"),
-     Input("alert-interval", "n_intervals")],
+     Input("alert-interval", "n_intervals"),
+     Input("targets-store", "data")],
     [State("alert-logs-store", "data"),
      State("triggered-alerts-store", "data"),
      State("is-first-load", "data")],
     prevent_initial_call=False
 )
-def handle_alert_detection(alert_config, n_intervals, current_logs, prev_triggered, is_first_load):
+def handle_alert_detection(alert_config, n_intervals, current_targets, current_logs, prev_triggered, is_first_load):
     ctx = callback_context
     config = alert_config or load_alert_config()
+    targets = current_targets or initial_mock_data
 
     if not ctx.triggered:
-        triggered = check_alerts(mock_data, config)
+        triggered = check_alerts(targets, config)
         logs = current_logs or load_alert_logs()
         banner = create_alert_banner(triggered)
-        stats_children = [create_stats_card(data, config) for data in mock_data]
-        gauge_figures = [create_gauge_chart(data, config) for data in mock_data]
-        return [banner, logs, triggered, stats_children, False] + gauge_figures
+        stats_children = [create_stats_card(data, config) for data in targets]
+        gauge_children = [
+            html.Div([
+                dcc.Graph(
+                    id=f"gauge-{idx}",
+                    figure=create_gauge_chart(data, config),
+                    config={'displayModeBar': False},
+                    className="gauge-chart"
+                )
+            ], className=f"chart-container{' alert-chart-container' if data['name'] in config and data['completion'] < config[data['name']]['threshold'] else ''}")
+            for idx, data in enumerate(targets)
+        ]
+        return [banner, logs, triggered, stats_children, gauge_children, False]
 
     _is_initial = is_first_load if is_first_load is not None else False
     prev_names = set(a["name"] for a in (prev_triggered or []))
 
     triggered, updated_logs = detect_and_log_alerts(
-        mock_data, config, prev_triggered_names=prev_names, is_initial_load=_is_initial
+        targets, config, prev_triggered_names=prev_names, is_initial_load=_is_initial
     )
 
     banner = create_alert_banner(triggered)
-    stats_children = [create_stats_card(data, config) for data in mock_data]
-    gauge_figures = [create_gauge_chart(data, config) for data in mock_data]
+    stats_children = [create_stats_card(data, config) for data in targets]
+    gauge_children = [
+        html.Div([
+            dcc.Graph(
+                id=f"gauge-{idx}",
+                figure=create_gauge_chart(data, config),
+                config={'displayModeBar': False},
+                className="gauge-chart"
+            )
+        ], className=f"chart-container{' alert-chart-container' if data['name'] in config and data['completion'] < config[data['name']]['threshold'] else ''}")
+        for idx, data in enumerate(targets)
+    ]
 
-    return [banner, updated_logs, triggered, stats_children, False] + gauge_figures
+    return [banner, updated_logs, triggered, stats_children, gauge_children, False]
 
 
 @app.callback(
@@ -624,6 +916,50 @@ def handle_alert_detection(alert_config, n_intervals, current_logs, prev_trigger
 def update_alert_history(alert_logs):
     logs = alert_logs or load_alert_logs()
     return create_alert_history_panel(logs)
+
+
+@app.callback(
+    [Output("alert-config-store", "data"),
+     Output("alert-config-status", "children")],
+    [Input("save-alert-config-btn", "n_clicks")],
+    [State({"type": "threshold-input", "index": ALL}, "value"),
+     State({"type": "threshold-input", "index": ALL}, "id"),
+     State({"type": "level-dropdown", "index": ALL}, "value"),
+     State({"type": "level-dropdown", "index": ALL}, "id")],
+    prevent_initial_call=False
+)
+def handle_alert_config_save(n_clicks, thresholds, threshold_ids, levels, level_ids):
+    if not n_clicks or n_clicks == 0:
+        return load_alert_config(), ""
+
+    new_config = {}
+    if thresholds and threshold_ids:
+        for i, tid in enumerate(threshold_ids):
+            name = tid["index"]
+            threshold = thresholds[i] if thresholds[i] is not None else 70
+            new_config[name] = {"threshold": int(threshold), "level": "medium"}
+
+    if levels and level_ids:
+        for i, lid in enumerate(level_ids):
+            name = lid["index"]
+            level = levels[i] if levels[i] is not None else "medium"
+            if name in new_config:
+                new_config[name]["level"] = level
+            else:
+                new_config[name] = {"threshold": 70, "level": level}
+
+    existing = load_alert_config()
+    for k, v in existing.items():
+        if k not in new_config:
+            new_config[k] = v
+
+    save_alert_config(new_config)
+    status = html.Div([
+        html.Span("✅", className="status-icon"),
+        " 预警配置已保存成功！"
+    ], className="config-save-success")
+
+    return new_config, status
 
 
 if __name__ == "__main__":
